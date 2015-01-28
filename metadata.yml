@@ -1,0 +1,15 @@
+name:             "amanda_pattern"
+maintainer:       "TIS Inc."
+maintainer_email: "ccndctr@gmail.com"
+license:          "Apache v2.0"
+description:      "CloudConductor optional pattern for Amanda"
+version:          "0.0.1"
+url:              "https://github.com/cloudconductor-patterns/amanda_pattern"
+
+type:      "optional"
+depends:   []
+conflicts: []
+
+supports:
+  - os: "centos"
+    version: "= 6.5"

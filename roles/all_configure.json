@@ -1,0 +1,9 @@
+{
+  "name": "all_configure",
+  "description": "Setups amanda",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "recipe[amanda_part::all_configure]"
+  ]
+}
