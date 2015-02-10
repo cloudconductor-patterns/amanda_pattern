@@ -1,6 +1,7 @@
 default['amanda_part']['config_name'] = 'default'
-default['amanda_part']['server']['config_name'] = '/amanda'
-default['amanda_part']['server']['config_name'] = '/etc/amanda'
+default['amanda_part']['server']['amanda_dir'] = '/amanda'
+default['amanda_part']['server']['amanda_config_dir'] = '/etc/amanda'
+default['amanda_part']['server']['var_amanda_dir'] = '/var/lib/amanda'
 default['amanda_part']['server']['slot'] = 8
 default['amanda_part']['server']['vtapes_dir'] = '/amanda/vtapes'
 default['amanda_part']['server']['holding_dir'] = '/amanda/holding'
@@ -8,8 +9,9 @@ default['amanda_part']['server']['info_file'] = '/amanda/state/curinfo'
 default['amanda_part']['server']['log_dir'] = '/amanda/state/log'
 default['amanda_part']['server']['index_dir'] = '/amanda/state/index'
 default['amanda_part']['server']['dumpuser'] = 'amandabackup'
+default['amanda_part']['server']['dumpusergroup'] = 'disk'
 default['amanda_part']['server']['config_dir'] = File.join(
-  node['amanda_part']['server']['config_name'],
+  node['amanda_part']['server']['amanda_config_dir'],
   node['amanda_part']['config_name']
 )
 default['amanda_part']['server']['storage'] = 's3'
@@ -55,8 +57,18 @@ default['amanda_part']['server']['autolabel'] = node['amanda_part']['server'][st
 default['amanda_part']['server']['labelstr'] = node['amanda_part']['server'][storage]['labelstr']
 default['amanda_part']['server']['tapecycle'] = 4
 default['amanda_part']['server']['dumpcycle'] = '3 days'
+default['amanda_part']['server']['dumptype'] = 'simple-tar'
 default['amanda_part']['server']['holdingdisk']['name'] = 'hd1'
 default['amanda_part']['server']['holdingdisk']['directory'] = '/amanda/holding'
 default['amanda_part']['server']['holdingdisk']['use'] = '2 mbytes'
 default['amanda_part']['server']['holdingdisk']['chunksize'] = '1 mbyte'
 
+default['amanda_part']['client']['amanda_config_dir'] = node['amanda_part']['server']['amanda_config_dir']
+default['amanda_part']['client']['config_dir'] = File.join(
+  node['amanda_part']['client']['amanda_config_dir'],
+  node['amanda_part']['config_name']
+)
+default['amanda_part']['client']['var_amanda_dir'] = node['amanda_part']['server']['var_amanda_dir']
+default['amanda_part']['client']['dumpuser'] = node['amanda_part']['server']['dumpuser']
+default['amanda_part']['client']['dumpusergroup'] = node['amanda_part']['server']['dumpusergroup']
+default['amanda_part']['client']['tpchanger'] = node['amanda_part']['server'][storage]['tpchanger']['name']

@@ -1,6 +1,6 @@
 {
   "name": "backup_member_ready",
-  "description": Re-configures amanda",
+  "description": "Re-configures amanda",
   "chef_type": "role",
   "json_class":"Chef::Role",
   "run_list": [
