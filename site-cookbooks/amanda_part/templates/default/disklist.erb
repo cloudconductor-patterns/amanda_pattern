@@ -1,0 +1,5 @@
+<% @backup_restore_config.each do |hostname, config| %>
+  <% config[:paths].each do |path_config| %>
+<%= hostname %> <%= path_config[:path] %> dumptype_<%= path_config[:postfix] %>
+  <% end %>
+<% end %>

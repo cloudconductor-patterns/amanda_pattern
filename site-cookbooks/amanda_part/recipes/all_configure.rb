@@ -61,4 +61,49 @@ template amanda_client_conf do
   variables(
     server: server[:hostname]
   )
+  not_if { roles.include?('backup') }
+end
+
+directory node['amanda_part']['client']['script_dir'] do
+  owner node['amanda_part']['client']['dumpuser']
+  group node['amanda_part']['client']['dumpusergroup']
+  mode 0755
+  recursive true
+  action :create
+  not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
+end
+
+currenthost_backup_restore_config = host_backup_restore_config.select do |hostname, config|
+  puts hostname
+  puts `hostname`.strip
+  hostname if `hostname`.strip == hostname
+end
+currenthost_backup_restore_config.each do |hostname, config|
+  data = config[:paths].select do |path_config|
+    path_config unless path_config[:script].nil?
+  end
+  data.each do |path_config|
+    script_path = File.join(node['amanda_part']['client']['script_dir'], "pre_script_#{path_config[:postfix]}")
+    template script_path do
+      owner node['amanda_part']['client']['dumpuser']
+      group node['amanda_part']['client']['dumpusergroup']
+      source 'script.erb'
+      mode 0755
+      variables(
+        script: path_config[:script][:backup]
+      )
+      not_if { path_config[:script][:backup].nil? }
+    end
+    script_path = File.join(node['amanda_part']['client']['script_dir'], "post_script_#{path_config[:postfix]}")
+    template script_path do
+      owner node['amanda_part']['client']['dumpuser']
+      group node['amanda_part']['client']['dumpusergroup']
+      source 'script.erb'
+      mode 0755
+      variables(
+        script: path_config[:script][:restore]
+      )
+      not_if { path_config[:script][:restore].nil? }
+    end  
+  end
 end

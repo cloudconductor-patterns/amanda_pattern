@@ -6,6 +6,17 @@ dumpuser "<%= node['amanda_part']['server']['dumpuser'] %>"
 
 <%= node['amanda_part']['server']['definition'] %>
 
+define dumptype dumptype_<%= node['amanda_part']['server']['dumptype'] %> {
+    program "GNUTAR"
+    compress none
+    index
+    priority low
+}
+
+<% @dumptype_definitions.each do |dumptype_definition| %>
+<%= dumptype_definition %>
+<% end %>
+
 tapetype <%= node['amanda_part']['server']['tapetype'] %>
 tpchanger "<%= node['amanda_part']['server']['tpchanger'] %>"
 autolabel "<%= node['amanda_part']['server']['autolabel'] %>" empty VOLUME_ERROR

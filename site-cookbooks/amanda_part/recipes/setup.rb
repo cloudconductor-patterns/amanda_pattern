@@ -48,5 +48,6 @@ template amanda_conf do
   group node['amanda_part']['server']['dumpusergroup']
   source 'amanda.conf.erb'
   mode 0644
+  variables(dumptype_definitions: [])
 end
 

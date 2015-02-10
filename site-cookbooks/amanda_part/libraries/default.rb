@@ -28,15 +28,16 @@ module CloudConductor
         host_role_config = role_backup_restore_config.select do |role|
           role if server[:roles].include?(role.to_s)
         end
-        config[hostname] = {}
+        temp_config = {}
         host_role_config.each do |role, role_config|
-          ::Chef::Mixin::DeepMerge.deep_merge!(role_config, config[hostname])
+          ::Chef::Mixin::DeepMerge.deep_merge!(role_config, temp_config)
         end
-        next if config[hostname][:paths].nil?
+        next if temp_config[:paths].nil?
+        config[hostname] = temp_config
         config[hostname][:paths].map! do |path_config|
           path = path_config[:path].gsub('/', '_')
-          dumptype = path_config[:script].nil? ? node['amanda_part']['server']['dumptype'] : "dumptype_#{hostname}#{path}"
-          path_config[:dumptype] = dumptype
+          postfix = path_config[:script].nil? ? node['amanda_part']['server']['dumptype'] : "#{hostname}#{path}"
+          path_config[:postfix] = postfix
           path_config
         end
       end
