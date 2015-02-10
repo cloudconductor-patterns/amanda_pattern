@@ -131,7 +131,7 @@
     "BackupSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable td-agent access",
+        "GroupDescription" : "Enable amanda access",
         "VpcId" : { "Ref" : "VpcId" },
         "SecurityGroupIngress" : [
           {"IpProtocol" : "tcp", "FromPort" : "10080", "ToPort" : "10080", "CidrIp" : "10.0.0.0/16"},

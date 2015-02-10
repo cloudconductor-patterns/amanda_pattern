@@ -1,0 +1,20 @@
+org "<%= node['amanda_part']['config_name'] %>"
+infofile "<%= node['amanda_part']['server']['info_file'] %>"
+logdir "<%= node['amanda_part']['server']['log_dir'] %>"
+indexdir "<%= node['amanda_part']['server']['index_dir'] %>"
+dumpuser "<%= node['amanda_part']['server']['dumpuser'] %>"
+
+<%= node['amanda_part']['server']['definition'] %>
+
+tapetype <%= node['amanda_part']['server']['tapetype'] %>
+tpchanger "<%= node['amanda_part']['server']['tpchanger'] %>"
+autolabel "<%= node['amanda_part']['server']['autolabel'] %>" empty VOLUME_ERROR
+labelstr "<%= node['amanda_part']['server']['labelstr'] %>"
+tapecycle <%= node['amanda_part']['server']['tapecycle'] %>
+dumpcycle <%= node['amanda_part']['server']['dumpcycle'] %>
+
+holdingdisk <%= node['amanda_part']['server']['holdingdisk']['name'] %> {
+    directory "<%= node['amanda_part']['server']['holdingdisk']['directory'] %>"
+    use <%= node['amanda_part']['server']['holdingdisk']['use'] %>
+    chunksize <%= node['amanda_part']['server']['holdingdisk']['chunksize'] %>
+}

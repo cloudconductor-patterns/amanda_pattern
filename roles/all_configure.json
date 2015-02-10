@@ -1,6 +1,6 @@
 {
   "name": "all_configure",
-  "description": "Setups amanda",
+  "description": "Configures amanda",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [

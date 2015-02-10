@@ -1,0 +1,9 @@
+{
+  "name": "backup_member_ready",
+  "description": Re-configures amanda",
+  "chef_type": "role",
+  "json_class":"Chef::Role",
+  "run_list": [
+    "recipe[amanda_part::member_ready]"
+  ]
+}
