@@ -7,7 +7,7 @@ template amandahosts do
   owner node['amanda_part']['server']['dumpuser']
   group node['amanda_part']['server']['dumpusergroup']
   source '.amandahosts-server.erb'
-  mode 0644
+  mode 0600
   variables(
     server: server,
     clients: clients
@@ -41,10 +41,10 @@ define script-tool pre_backup_#{path_config[:postfix]} {
   execute-on pre-dle-backup
 }
 
-define script-tool post_backup_#{path_config[:postfix]} {
+define script-tool post_restore_#{path_config[:postfix]} {
   plugin  "post_restore_#{path_config[:postfix]}"
   execute-where client
-  execute-on pre-dle-backup
+  execute-on post-recover
 }
 
 define dumptype dumptype_#{path_config[:postfix]} {

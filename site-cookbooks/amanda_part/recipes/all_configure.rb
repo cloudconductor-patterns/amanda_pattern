@@ -83,7 +83,7 @@ currenthost_backup_restore_config.each do |hostname, config|
     path_config unless path_config[:script].nil?
   end
   data.each do |path_config|
-    script_path = File.join(node['amanda_part']['client']['script_dir'], "pre_script_#{path_config[:postfix]}")
+    script_path = File.join(node['amanda_part']['client']['script_dir'], "pre_backup_#{path_config[:postfix]}")
     template script_path do
       owner node['amanda_part']['client']['dumpuser']
       group node['amanda_part']['client']['dumpusergroup']
@@ -94,7 +94,7 @@ currenthost_backup_restore_config.each do |hostname, config|
       )
       not_if { path_config[:script][:backup].nil? }
     end
-    script_path = File.join(node['amanda_part']['client']['script_dir'], "post_script_#{path_config[:postfix]}")
+    script_path = File.join(node['amanda_part']['client']['script_dir'], "post_restore_#{path_config[:postfix]}")
     template script_path do
       owner node['amanda_part']['client']['dumpuser']
       group node['amanda_part']['client']['dumpusergroup']

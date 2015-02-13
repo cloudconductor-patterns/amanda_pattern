@@ -32,14 +32,12 @@ s3_slots = (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
   format('%02d', slot)
 end.join(',')
 default['amanda_part']['server']['s3']['definition'] = <<S3_DEFINITION
-define tapetype #node['amanda_part']['server']['s3']['tapetype']} {
-    #{node['amanda_part']['server']['s3']['tapetype']['length']}
+define tapetype #{node['amanda_part']['server']['s3']['tapetype']['name']} {
+    length #{node['amanda_part']['server']['s3']['tapetype']['length']}
 }
 
 define changer #{node['amanda_part']['server']['s3']['tpchanger']['name']} {
-
-    tpchanger "chg-multi:s3:#{node['amanda_part']['server']['s3']['tpchanger']['bucket_name']}/slot-#{s3_slots}"
-
+    tpchanger "chg-multi:s3:#{node['amanda_part']['server']['s3']['tpchanger']['bucket_name']}/slot-{#{s3_slots}}"
     device-property "S3_ACCESS_KEY" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_access_key']}"
     device-property "S3_SECRET_KEY" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_secret_key']}"
     device-property "S3_BUCKET_LOCATION" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_bucket_location']}"

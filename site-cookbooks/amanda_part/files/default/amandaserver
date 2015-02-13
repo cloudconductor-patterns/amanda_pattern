@@ -1,5 +1,3 @@
-/etc/xinetd.d/amandaserver
-
 # default: on
 #
 # description: Amanda services for Amanda server and client.
