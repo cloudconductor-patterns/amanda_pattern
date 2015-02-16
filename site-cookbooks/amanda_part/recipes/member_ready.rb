@@ -4,8 +4,8 @@ clients = CloudConductorUtils::Consul.read_servers
 
 amandahosts = File.join(node['amanda_part']['server']['var_amanda_dir'], '.amandahosts')
 template amandahosts do
-  owner node['amanda_part']['server']['dumpuser']
-  group node['amanda_part']['server']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source '.amandahosts-server.erb'
   mode 0600
   variables(
@@ -18,8 +18,8 @@ end
 backup_restore_config = host_backup_restore_config
 disklist = File.join(node['amanda_part']['server']['config_dir'], 'disklist')
 template disklist do
-  owner node['amanda_part']['server']['dumpuser']
-  group node['amanda_part']['server']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source 'disklist.erb'
   mode 0644
   variables(
@@ -59,8 +59,8 @@ end
 
 amanda_conf = File.join(node['amanda_part']['server']['config_dir'], 'amanda.conf')
 template amanda_conf do
-  owner node['amanda_part']['server']['dumpuser']
-  group node['amanda_part']['server']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source 'amanda.conf.erb'
   mode 0644
   variables(

@@ -9,8 +9,8 @@ yum_package 'amanda-backup_server' do
 end
 
 cookbook_file '/etc/xinetd.d/amandaserver' do
-  owner node['amanda_part']['server']['dumpuser']
-  group node['amanda_part']['server']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source 'amandaserver'
   mode 0644
 end
@@ -27,14 +27,13 @@ dirs = [
   node['amanda_part']['server']['info_file'],
   node['amanda_part']['server']['log_dir'],
   node['amanda_part']['server']['index_dir'],
-  node['amanda_part']['server']['dumpuser'],
   node['amanda_part']['server']['config_dir'],
   *slot_dirs
 ]
 dirs.each do |dir|
   directory dir do
-    owner node['amanda_part']['server']['dumpuser']
-    group node['amanda_part']['server']['dumpusergroup']
+    owner node['amanda_part']['fileuser']
+    group node['amanda_part']['fileusergroup']
     mode 0755
     recursive true
     action :create
@@ -44,8 +43,8 @@ end
 
 amanda_conf = File.join(node['amanda_part']['server']['config_dir'], 'amanda.conf')
 template amanda_conf do
-  owner node['amanda_part']['server']['dumpuser']
-  group node['amanda_part']['server']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source 'amanda.conf.erb'
   mode 0644
   variables(dumptype_definitions: [])

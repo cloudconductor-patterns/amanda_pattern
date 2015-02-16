@@ -14,15 +14,15 @@ yum_package 'amanda-backup_client' do
 end
 
 cookbook_file '/etc/xinetd.d/amandaclient' do
-  owner node['amanda_part']['client']['dumpuser']
-  group node['amanda_part']['client']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source 'amandaclient'
   mode 0644
 end
 
 directory node['amanda_part']['client']['var_amanda_dir'] do
-  owner node['amanda_part']['client']['dumpuser']
-  group node['amanda_part']['client']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   mode 0755
   recursive true
   action :create
@@ -32,8 +32,8 @@ end
 server = server_info('backup').first
 amandahosts_client = File.join(node['amanda_part']['client']['var_amanda_dir'], '.amandahosts')
 template amandahosts_client do
-  owner node['amanda_part']['client']['dumpuser']
-  group node['amanda_part']['client']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source '.amandahosts-client.erb'
   mode 0644
   variables(
@@ -43,8 +43,8 @@ template amandahosts_client do
 end
 
 directory node['amanda_part']['client']['config_dir'] do
-  owner node['amanda_part']['client']['dumpuser']
-  group node['amanda_part']['client']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   mode 0755
   recursive true
   action :create
@@ -54,8 +54,8 @@ end
 server = server_info('backup').first
 amanda_client_conf = File.join(node['amanda_part']['client']['config_dir'], 'amanda-client.conf')
 template amanda_client_conf do
-  owner node['amanda_part']['client']['dumpuser']
-  group node['amanda_part']['client']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   source 'amanda-client.conf.erb'
   mode 0644
   variables(
@@ -65,8 +65,8 @@ template amanda_client_conf do
 end
 
 directory node['amanda_part']['client']['script_dir'] do
-  owner node['amanda_part']['client']['dumpuser']
-  group node['amanda_part']['client']['dumpusergroup']
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
   mode 0755
   recursive true
   action :create
@@ -85,8 +85,8 @@ currenthost_backup_restore_config.each do |hostname, config|
   data.each do |path_config|
     script_path = File.join(node['amanda_part']['client']['script_dir'], "pre_backup_#{path_config[:postfix]}")
     template script_path do
-      owner node['amanda_part']['client']['dumpuser']
-      group node['amanda_part']['client']['dumpusergroup']
+      owner node['amanda_part']['fileuser']
+      group node['amanda_part']['fileusergroup']
       source 'script.erb'
       mode 0755
       variables(
@@ -96,8 +96,8 @@ currenthost_backup_restore_config.each do |hostname, config|
     end
     script_path = File.join(node['amanda_part']['client']['script_dir'], "post_restore_#{path_config[:postfix]}")
     template script_path do
-      owner node['amanda_part']['client']['dumpuser']
-      group node['amanda_part']['client']['dumpusergroup']
+      owner node['amanda_part']['fileuser']
+      group node['amanda_part']['fileusergroup']
       source 'script.erb'
       mode 0755
       variables(

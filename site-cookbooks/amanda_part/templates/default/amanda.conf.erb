@@ -2,7 +2,7 @@ org "<%= node['amanda_part']['config_name'] %>"
 infofile "<%= node['amanda_part']['server']['info_file'] %>"
 logdir "<%= node['amanda_part']['server']['log_dir'] %>"
 indexdir "<%= node['amanda_part']['server']['index_dir'] %>"
-dumpuser "<%= node['amanda_part']['server']['dumpuser'] %>"
+dumpuser "<%= node['amanda_part']['execuser'] %>"
 
 <%= node['amanda_part']['server']['definition'] %>
 
