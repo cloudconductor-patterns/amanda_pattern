@@ -1,6 +1,4 @@
-bash 'amdump' do
-  user 'root'
-  code <<-EOH
-  amdump default > /tmp/a 2>&1
-  EOH
+execute 'amdump' do
+  user node['amanda_part']['execuser']
+  command "amdump #{node['amanda_part']['config_name']}"
 end
