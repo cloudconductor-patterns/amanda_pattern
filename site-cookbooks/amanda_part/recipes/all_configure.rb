@@ -13,11 +13,17 @@ yum_package 'amanda-backup_client' do
   not_if { roles.include?('backup') }
 end
 
+service 'xinetd' do
+    supports status: true, restart: true, reload: true
+    action :nothing
+end
+
 cookbook_file '/etc/xinetd.d/amandaclient' do
   owner node['amanda_part']['client']['dumpuser']
   group node['amanda_part']['client']['dumpusergroup']
   source 'amandaclient'
   mode 0644
+  notifies :restart, 'service[xinetd]', :immediate
 end
 
 directory node['amanda_part']['client']['var_amanda_dir'] do
@@ -35,7 +41,7 @@ template amandahosts_client do
   owner node['amanda_part']['client']['dumpuser']
   group node['amanda_part']['client']['dumpusergroup']
   source '.amandahosts-client.erb'
-  mode 0644
+  mode 0600
   variables(
     server: server
   )
@@ -74,8 +80,6 @@ directory node['amanda_part']['client']['script_dir'] do
 end
 
 currenthost_backup_restore_config = host_backup_restore_config.select do |hostname, config|
-  puts hostname
-  puts `hostname`.strip
   hostname if `hostname`.strip == hostname
 end
 currenthost_backup_restore_config.each do |hostname, config|
