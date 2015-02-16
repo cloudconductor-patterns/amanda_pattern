@@ -21,8 +21,10 @@ tapetype <%= node['amanda_part']['server']['tapetype'] %>
 tpchanger "<%= node['amanda_part']['server']['tpchanger'] %>"
 autolabel "<%= node['amanda_part']['server']['autolabel'] %>" empty VOLUME_ERROR
 labelstr "<%= node['amanda_part']['server']['labelstr'] %>"
-tapecycle <%= node['amanda_part']['server']['tapecycle'] %>
+
 dumpcycle <%= node['amanda_part']['server']['dumpcycle'] %>
+runspercycle <%= node['amanda_part']['server']['runspercycle'] %>
+tapecycle <%= node['amanda_part']['server']['tapecycle'] %>
 
 holdingdisk <%= node['amanda_part']['server']['holdingdisk']['name'] %> {
     directory "<%= node['amanda_part']['server']['holdingdisk']['directory'] %>"
