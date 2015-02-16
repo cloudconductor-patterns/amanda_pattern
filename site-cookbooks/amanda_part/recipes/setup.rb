@@ -8,15 +8,20 @@ yum_package 'amanda-backup_server' do
   action :nothing
 end
 
+service 'xinetd' do
+    supports status: true, restart: true, reload: true
+    action :nothing
+end
+
 cookbook_file '/etc/xinetd.d/amandaserver' do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
   source 'amandaserver'
   mode 0644
+  notifies :restart, 'service[xinetd]', :immediate
 end
 
 slot_dirs = (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
-  puts File.join(node['amanda_part']['server']['vtapes_dir'], slot.to_s)
   File.join(node['amanda_part']['server']['vtapes_dir'], slot.to_s)
 end.join(',')
 dirs = [
