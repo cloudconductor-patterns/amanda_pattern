@@ -26,17 +26,17 @@ cookbook_file '/etc/xinetd.d/amandaclient' do
   notifies :restart, 'service[xinetd]', :immediate
 end
 
-directory node['amanda_part']['client']['var_amanda_dir'] do
+directory node['amanda_part']['var_amanda_dir'] do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
   mode 0755
   recursive true
   action :create
-  not_if { File.exist?(node['amanda_part']['client']['var_amanda_dir']) }
+  not_if { File.exist?(node['amanda_part']['var_amanda_dir']) }
 end
 
 server = server_info('backup').first
-amandahosts_client = File.join(node['amanda_part']['client']['var_amanda_dir'], '.amandahosts')
+amandahosts_client = File.join(node['amanda_part']['var_amanda_dir'], '.amandahosts')
 template amandahosts_client do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
@@ -48,17 +48,17 @@ template amandahosts_client do
   not_if { roles.include?('backup') }
 end
 
-directory node['amanda_part']['client']['config_dir'] do
+directory node['amanda_part']['config_dir'] do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
   mode 0755
   recursive true
   action :create
-  not_if { File.exist?(node['amanda_part']['client']['config_dir']) }
+  not_if { File.exist?(node['amanda_part']['config_dir']) }
 end
 
 server = server_info('backup').first
-amanda_client_conf = File.join(node['amanda_part']['client']['config_dir'], 'amanda-client.conf')
+amanda_client_conf = File.join(node['amanda_part']['config_dir'], 'amanda-client.conf')
 template amanda_client_conf do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']

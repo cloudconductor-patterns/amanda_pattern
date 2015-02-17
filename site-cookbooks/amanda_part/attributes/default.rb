@@ -2,17 +2,17 @@ default['amanda_part']['config_name'] = 'default'
 default['amanda_part']['execuser'] = 'root'
 default['amanda_part']['fileuser'] = 'amandabackup'
 default['amanda_part']['filegroup'] = 'disk'
-default['amanda_part']['server']['amanda_dir'] = '/amanda'
-default['amanda_part']['server']['amanda_config_dir'] = '/etc/amanda'
-default['amanda_part']['server']['var_amanda_dir'] = '/var/lib/amanda'
+default['amanda_part']['amanda_dir'] = '/amanda'
+default['amanda_part']['amanda_config_dir'] = '/etc/amanda'
+default['amanda_part']['var_amanda_dir'] = '/var/lib/amanda'
 default['amanda_part']['server']['slot'] = 8
 default['amanda_part']['server']['vtapes_dir'] = '/amanda/vtapes'
 default['amanda_part']['server']['holding_dir'] = '/amanda/holding'
 default['amanda_part']['server']['info_file'] = '/amanda/state/curinfo'
 default['amanda_part']['server']['log_dir'] = '/amanda/state/log'
 default['amanda_part']['server']['index_dir'] = '/amanda/state/index'
-default['amanda_part']['server']['config_dir'] = File.join(
-  node['amanda_part']['server']['amanda_config_dir'],
+default['amanda_part']['config_dir'] = File.join(
+  node['amanda_part']['amanda_config_dir'],
   node['amanda_part']['config_name']
 )
 default['amanda_part']['server']['storage'] = 's3'
@@ -63,10 +63,5 @@ default['amanda_part']['server']['holdingdisk']['directory'] = '/amanda/holding'
 default['amanda_part']['server']['holdingdisk']['use'] = '2 mbytes'
 default['amanda_part']['server']['holdingdisk']['chunksize'] = '1 mbyte'
 
-default['amanda_part']['client']['amanda_config_dir'] = node['amanda_part']['server']['amanda_config_dir']
-default['amanda_part']['client']['config_dir'] = File.join(
-  node['amanda_part']['client']['amanda_config_dir'],
-  node['amanda_part']['config_name']
-)
 default['amanda_part']['client']['tpchanger'] = node['amanda_part']['server'][storage]['tpchanger']['name']
 default['amanda_part']['client']['script_dir'] = '/usr/libexec/amanda/application'

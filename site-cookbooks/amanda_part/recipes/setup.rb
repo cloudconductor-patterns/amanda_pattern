@@ -25,14 +25,14 @@ slot_dirs = (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
   File.join(node['amanda_part']['server']['vtapes_dir'], slot.to_s)
 end.join(',')
 dirs = [
-  node['amanda_part']['server']['amanda_dir'],
-  node['amanda_part']['server']['amanda_config_dir'],
+  node['amanda_part']['amanda_dir'],
+  node['amanda_part']['amanda_config_dir'],
+  node['amanda_part']['config_dir'],
   node['amanda_part']['server']['vtapes_dir'],
   node['amanda_part']['server']['holding_dir'],
   node['amanda_part']['server']['info_file'],
   node['amanda_part']['server']['log_dir'],
   node['amanda_part']['server']['index_dir'],
-  node['amanda_part']['server']['config_dir'],
   *slot_dirs
 ]
 dirs.each do |dir|
@@ -46,7 +46,7 @@ dirs.each do |dir|
   end
 end
 
-amanda_conf = File.join(node['amanda_part']['server']['config_dir'], 'amanda.conf')
+amanda_conf = File.join(node['amanda_part']['config_dir'], 'amanda.conf')
 template amanda_conf do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
