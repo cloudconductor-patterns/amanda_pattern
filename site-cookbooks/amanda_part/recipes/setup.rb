@@ -21,37 +21,40 @@ cookbook_file '/etc/xinetd.d/amandaserver' do
   notifies :restart, 'service[xinetd]', :immediate
 end
 
-slot_dirs = (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
-  File.join(node['amanda_part']['server']['vtapes_dir'], slot.to_s)
-end.join(',')
-dirs = [
-  node['amanda_part']['amanda_dir'],
-  node['amanda_part']['amanda_config_dir'],
-  node['amanda_part']['config_dir'],
-  node['amanda_part']['server']['vtapes_dir'],
-  node['amanda_part']['server']['holding_dir'],
-  node['amanda_part']['server']['info_file'],
-  node['amanda_part']['server']['log_dir'],
-  node['amanda_part']['server']['index_dir'],
-  *slot_dirs
-]
-dirs.each do |dir|
-  directory dir do
+all_paths.each do |path|
+  config_name = "config#{path.gsub('/', '_')}"
+  config = amanda_config(config_name)
+  dirs = [
+    node['amanda_part']['amanda_dir'],
+    node['amanda_part']['amanda_config_dir'],
+    config['config_dir'],
+    config['vtapes_dir'],
+    config['holding_dir'],
+    config['info_dir'],
+    config['log_dir'],
+    config['index_dir'],
+    *config['slot_dirs']
+  ]
+  puts dirs
+  dirs.each do |dir|
+    directory dir do
+      owner node['amanda_part']['fileuser']
+      group node['amanda_part']['fileusergroup']
+      mode 0755
+      recursive true
+      action :create
+      not_if { File.exist?(dir) }
+    end
+  end
+  amanda_conf = File.join(config['config_dir'], 'amanda.conf')
+  template amanda_conf do
     owner node['amanda_part']['fileuser']
     group node['amanda_part']['fileusergroup']
-    mode 0755
-    recursive true
-    action :create
-    not_if { File.exist?(dir) }
+    source 'amanda.conf.erb'
+    mode 0644
+    variables(
+      config: config,
+      dumptype_definitions: []
+    )
   end
 end
-
-amanda_conf = File.join(node['amanda_part']['config_dir'], 'amanda.conf')
-template amanda_conf do
-  owner node['amanda_part']['fileuser']
-  group node['amanda_part']['fileusergroup']
-  source 'amanda.conf.erb'
-  mode 0644
-  variables(dumptype_definitions: [])
-end
-

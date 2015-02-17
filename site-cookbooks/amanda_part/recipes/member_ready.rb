@@ -67,3 +67,16 @@ template amanda_conf do
     dumptype_definitions: definitions
   )
 end
+
+hostname = `hostname`.strip
+hostinfo = backup_restore_config[hostname]
+cron_conf = File.join('/etc/cron.d', hostname)
+template cron do
+  owner node['amanda_part']['fileuser']
+  group node['amanda_part']['fileusergroup']
+  source 'cron.erb'
+  mode 0644
+  variables(
+    schedule: hostinfo['schedule']
+  )
+end
