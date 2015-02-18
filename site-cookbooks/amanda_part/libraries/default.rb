@@ -71,9 +71,12 @@ module CloudConductor
 
     def amanda_config(hostname, path)
       storage = node['amanda_part']['server']['storage']
-      config_name = "#{hostname}#{path.gsub('/', '_')}"
+      disk_postfix = path.gsub('/', '_')
+      config_name = "#{hostname}#{disk_postfix}"
       {
         'name' => config_name,
+        'hostname' => hostname,
+        'disk_postfix' => disk_postfix,
         'config_dir' => File.join(node['amanda_part']['amanda_config_dir'], config_name),
         'vtapes_dir' => File.join(node['amanda_part']['server']['vtapes_dir'], config_name),
         'holding_dir' => File.join(node['amanda_part']['server']['holding_dir'], config_name),
