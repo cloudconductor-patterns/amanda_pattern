@@ -31,7 +31,7 @@ directory node['amanda_part']['amanda_data_dir'] do
   mode 0755
   recursive true
   action :create
-  only_if { server? and !File.exist?(node['amanda_part']['amanda_data_dir']) }
+  not_if { server? or File.exist?(node['amanda_part']['amanda_data_dir']) }
 end
 
 server = server_info('backup').first
@@ -53,7 +53,7 @@ directory node['amanda_part']['client']['script_dir'] do
   mode 0755
   recursive true
   action :create
-  only_if { server? and !File.exist?(node['amanda_part']['client']['script_dir']) }
+  not_if { server? or File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
 hostname = `hostname`.strip
@@ -65,7 +65,7 @@ host_backup_restore_config[hostname].each do |path_config|
     mode 0755
     recursive true
     action :create
-    only_if { server? and !File.exist?(config['config_dir']) }
+    not_if { server? or File.exist?(config['config_dir']) }
   end
   amanda_client_conf = File.join(config['config_dir'], 'amanda-client.conf')
   template amanda_client_conf do
