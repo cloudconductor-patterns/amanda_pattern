@@ -33,25 +33,11 @@ default['amanda_part']['server']['s3']['tpchanger']['s3_bucket_location'] = ''
 default['amanda_part']['server']['s3']['tpchanger']['threads'] = '3'
 default['amanda_part']['server']['s3']['tpchanger']['s3_ssl'] = 'yes'
 default['amanda_part']['server']['s3']['tpchanger']['changerfile'] = 's3-statefile'
-default['amanda_part']['server']['s3']['autolabel'] = 'S3-%%%%'
-default['amanda_part']['server']['s3']['labelstr'] = '^S3-[0-9][0-9]*$'
 s3_slots = (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
   format('%02d', slot)
 end.join(',')
-default['amanda_part']['server']['s3']['definition'] = <<S3_DEFINITION
-define tapetype #{node['amanda_part']['server']['s3']['tapetype']['name']} {
-    length #{node['amanda_part']['server']['s3']['tapetype']['length']}
-}
-
-define changer #{node['amanda_part']['server']['s3']['tpchanger']['name']} {
-    tpchanger "chg-multi:s3:#{node['amanda_part']['server']['s3']['tpchanger']['bucket_name']}/a/slot-{#{s3_slots}}"
-    device-property "S3_ACCESS_KEY" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_access_key']}"
-    device-property "S3_SECRET_KEY" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_secret_key']}"
-    device-property "S3_BUCKET_LOCATION" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_bucket_location']}"
-    device-property "NB_THREADS_BACKUP" "#{node['amanda_part']['server']['s3']['tpchanger']['threads']}"
-    device-property "S3_SSL" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_ssl']}"
-    changerfile  "#{node['amanda_part']['server']['s3']['tpchanger']['changerfile']}"
-}
-S3_DEFINITION
+default['amanda_part']['server']['s3']['tpchanger']['slots'] = s3_slots
+default['amanda_part']['server']['s3']['autolabel'] = 'S3-%%%%'
+default['amanda_part']['server']['s3']['labelstr'] = '^S3-[0-9][0-9]*$'
 
 default['amanda_part']['client']['script_dir'] = '/usr/libexec/amanda/application'

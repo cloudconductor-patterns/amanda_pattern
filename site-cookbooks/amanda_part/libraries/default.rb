@@ -96,7 +96,8 @@ module CloudConductor
         'holding_chunksize' => node['amanda_part']['server']['holding_chunksize'],
         'slot_dirs' => (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
           File.join(File.join(node['amanda_part']['server']['vtapes_dir'], config_name), slot.to_s)
-        end
+        end,
+        'storage' => node['amanda_part']['server']['storage']
       }
     end
 
