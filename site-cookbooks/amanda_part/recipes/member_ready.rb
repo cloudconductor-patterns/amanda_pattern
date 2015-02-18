@@ -2,7 +2,7 @@
 server = server_info('backup').first
 clients = CloudConductorUtils::Consul.read_servers
 
-amandahosts = File.join(node['amanda_part']['var_amanda_dir'], '.amandahosts')
+amandahosts = File.join(node['amanda_part']['amanda_data_dir'], '.amandahosts')
 template amandahosts do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
@@ -12,71 +12,72 @@ template amandahosts do
     server: server,
     clients: clients
   )
+  only_if { server? }
 end
 
-# update disklist
-backup_restore_config = host_backup_restore_config
-disklist = File.join(node['amanda_part']['config_dir'], 'disklist')
-template disklist do
-  owner node['amanda_part']['fileuser']
-  group node['amanda_part']['fileusergroup']
-  source 'disklist.erb'
-  mode 0644
-  variables(
-    backup_restore_config: backup_restore_config
-  )
-end
+# update disklist and amanda.conf
+host_backup_restore_config.each do |hostname, backup_restore_config|
+  backup_restore_config.each do |path_config|
+    config = amanda_config(hostname, path_config[:path])
+    [
+      node['amanda_part']['amanda_dir'],
+      node['amanda_part']['amanda_config_dir'],
+      config['config_dir'],
+      config['vtapes_dir'],
+      config['holding_dir'],
+      config['info_dir'],
+      config['log_dir'],
+      config['index_dir'],
+      *config['slot_dirs']
+    ].each do |dir|
+      directory dir do
+        owner node['amanda_part']['fileuser']
+        group node['amanda_part']['fileusergroup']
+        mode 0755
+        recursive true
+        action :create
+        not_if { server? or File.exist?(dir) }
+      end
+    end
 
-# update dumptype definitions in amanda.conf
-definitions = []
-host_backup_restore_config.each do |hostname, config|
-  data = config[:paths].select do |path_config|
-    path_config unless path_config[:script].nil?
+    disklist = File.join(config['config_dir'], 'disklist')
+    template disklist do
+      owner node['amanda_part']['fileuser']
+      group node['amanda_part']['fileusergroup']
+      source 'disklist.erb'
+      mode 0644
+      variables(
+        hostname: hostname,
+        path_config: path_config
+      )
+      only_if { server? }
+    end
+
+    amanda_conf = File.join(config['config_dir'], 'amanda.conf')
+    template amanda_conf do
+      owner node['amanda_part']['fileuser']
+      group node['amanda_part']['fileusergroup']
+      source 'amanda.conf.erb'
+      mode 0644
+      variables(
+        config: config,
+        path_config: path_config
+      )
+      only_if { server? }
+    end
+
+    cron_conf = File.join('/etc/cron.d', config['name'])
+    template cron_conf do
+      owner node['amanda_part']['execuser']
+      source 'cron.erb'
+      mode 0644
+      variables(
+        config_name: config['name'],
+        schedule: path_config[:schedule]
+      )
+      only_if { server? }
+    end
   end
-  data.each do |path_config|
-    definition = <<DEFINITION
-define script-tool pre_backup_#{path_config[:postfix]} {
-  plugin "pre_backup_#{path_config[:postfix]}"
-  execute-where client
-  execute-on pre-dle-backup
-}
-
-define script-tool post_restore_#{path_config[:postfix]} {
-  plugin  "post_restore_#{path_config[:postfix]}"
-  execute-where client
-  execute-on post-recover
-}
-
-define dumptype dumptype_#{path_config[:postfix]} {
-  dumptype_#{node['amanda_part']['server']['dumptype']}
-  script "pre_backup_#{path_config[:postfix]}"
-  script "post_restore_#{path_config[:postfix]}"
-}
-DEFINITION
-    definitions << definition
-  end
 end
 
-amanda_conf = File.join(node['amanda_part']['config_dir'], 'amanda.conf')
-template amanda_conf do
-  owner node['amanda_part']['fileuser']
-  group node['amanda_part']['fileusergroup']
-  source 'amanda.conf.erb'
-  mode 0644
-  variables(
-    dumptype_definitions: definitions
-  )
-end
 
-hostname = `hostname`.strip
-hostinfo = backup_restore_config[hostname]
-cron_conf = File.join('/etc/cron.d', hostname)
-template cron do
-  owner node['amanda_part']['fileuser']
-  group node['amanda_part']['fileusergroup']
-  source 'cron.erb'
-  mode 0644
-  variables(
-    schedule: hostinfo['schedule']
-  )
-end

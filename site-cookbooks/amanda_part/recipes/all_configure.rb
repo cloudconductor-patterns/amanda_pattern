@@ -1,21 +1,19 @@
-require 'cloud_conductor_utils/consul'
-roles = ENV['ROLE'].strip.split(',')
-
 remote_file "#{Chef::Config[:file_cache_path]}/amanda-backup_client-3.3.6-1.rhel6.x86_64.rpm" do
   source 'http://www.zmanda.com/downloads/community/Amanda/3.3.6/Redhat_Enterprise_6.0/amanda-backup_client-3.3.6-1.rhel6.x86_64.rpm'
   notifies :install, 'yum_package[amanda-backup_client]', :immediately
-  not_if { roles.include?('backup')  }
+  not_if { server? }
 end
 
 yum_package 'amanda-backup_client' do
   source "#{Chef::Config[:file_cache_path]}/amanda-backup_client-3.3.6-1.rhel6.x86_64.rpm"
   action :nothing
-  not_if { roles.include?('backup') }
+  not_if { server? }
 end
 
 service 'xinetd' do
-    supports status: true, restart: true, reload: true
-    action :nothing
+  supports status: true, restart: true, reload: true
+  action :nothing
+  not_if { server? }
 end
 
 cookbook_file '/etc/xinetd.d/amandaclient' do
@@ -24,19 +22,20 @@ cookbook_file '/etc/xinetd.d/amandaclient' do
   source 'amandaclient'
   mode 0644
   notifies :restart, 'service[xinetd]', :immediate
+  not_if { server? }
 end
 
-directory node['amanda_part']['var_amanda_dir'] do
+directory node['amanda_part']['amanda_data_dir'] do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
   mode 0755
   recursive true
   action :create
-  not_if { File.exist?(node['amanda_part']['var_amanda_dir']) }
+  not_if { server? or File.exist?(node['amanda_part']['amanda_data_dir']) }
 end
 
 server = server_info('backup').first
-amandahosts_client = File.join(node['amanda_part']['var_amanda_dir'], '.amandahosts')
+amandahosts_client = File.join(node['amanda_part']['amanda_data_dir'], '.amandahosts')
 template amandahosts_client do
   owner node['amanda_part']['fileuser']
   group node['amanda_part']['fileusergroup']
@@ -45,29 +44,7 @@ template amandahosts_client do
   variables(
     server: server
   )
-  not_if { roles.include?('backup') }
-end
-
-directory node['amanda_part']['config_dir'] do
-  owner node['amanda_part']['fileuser']
-  group node['amanda_part']['fileusergroup']
-  mode 0755
-  recursive true
-  action :create
-  not_if { File.exist?(node['amanda_part']['config_dir']) }
-end
-
-server = server_info('backup').first
-amanda_client_conf = File.join(node['amanda_part']['config_dir'], 'amanda-client.conf')
-template amanda_client_conf do
-  owner node['amanda_part']['fileuser']
-  group node['amanda_part']['fileusergroup']
-  source 'amanda-client.conf.erb'
-  mode 0644
-  variables(
-    server: server[:hostname]
-  )
-  not_if { roles.include?('backup') }
+  not_if { server? }
 end
 
 directory node['amanda_part']['client']['script_dir'] do
@@ -76,38 +53,43 @@ directory node['amanda_part']['client']['script_dir'] do
   mode 0755
   recursive true
   action :create
-  not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
+  not_if { server? or File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
-currenthost_backup_restore_config = host_backup_restore_config.select do |hostname, config|
-  hostname if `hostname`.strip == hostname
-end
-currenthost_backup_restore_config.each do |hostname, config|
-  data = config[:paths].select do |path_config|
-    path_config unless path_config[:script].nil?
+hostname = `hostname`.strip
+host_backup_restore_config[hostname].each do |path_config|
+  config = amanda_config(hostname, path_config[:path])
+  directory config['config_dir'] do
+    owner node['amanda_part']['fileuser']
+    group node['amanda_part']['fileusergroup']
+    mode 0755
+    recursive true
+    action :create
+    not_if { server? or File.exist?(config['config_dir']) }
   end
-  data.each do |path_config|
-    script_path = File.join(node['amanda_part']['client']['script_dir'], "pre_backup_#{path_config[:postfix]}")
+  amanda_client_conf = File.join(config['config_dir'], 'amanda-client.conf')
+  template amanda_client_conf do
+    owner node['amanda_part']['fileuser']
+    group node['amanda_part']['fileusergroup']
+    source 'amanda-client.conf.erb'
+    mode 0644
+    variables(
+      server: server,
+      config: config
+    )
+    not_if { server? }
+  end
+  path_config[:scripts].each do |script_name, script_config|
+    script_path = File.join(node['amanda_part']['client']['script_dir'], script_name)
     template script_path do
       owner node['amanda_part']['fileuser']
       group node['amanda_part']['fileusergroup']
       source 'script.erb'
       mode 0755
       variables(
-        script: path_config[:script][:backup]
+        script: script_config[:script]
       )
-      not_if { path_config[:script][:backup].nil? }
+      not_if { server? }
     end
-    script_path = File.join(node['amanda_part']['client']['script_dir'], "post_restore_#{path_config[:postfix]}")
-    template script_path do
-      owner node['amanda_part']['fileuser']
-      group node['amanda_part']['fileusergroup']
-      source 'script.erb'
-      mode 0755
-      variables(
-        script: path_config[:script][:restore]
-      )
-      not_if { path_config[:script][:restore].nil? }
-    end  
   end
 end

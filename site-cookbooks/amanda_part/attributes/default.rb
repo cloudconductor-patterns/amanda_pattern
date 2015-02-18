@@ -14,11 +14,12 @@ default['amanda_part']['server']['index_dir'] = File.join(node['amanda_part']['a
 default['amanda_part']['server']['dumpcycle'] = '1 weeks'
 default['amanda_part']['server']['runspercycle'] = '7 days'
 default['amanda_part']['server']['tapecycle'] = '8 tapes'
-default['amanda_part']['server']['dumptype'] = 'tar'
+default['amanda_part']['server']['dumptype'] = 'dumptype_tar'
 default['amanda_part']['server']['holding_prefix'] = 'hd_'
 default['amanda_part']['server']['holding_use'] = '2 mbytes'
 default['amanda_part']['server']['holding_chunksize'] = '1 mbyte'
 default['amanda_part']['server']['slot'] = 8
+default['amanda_part']['server']['schedule'] = "0 0 0 * *"
 default['amanda_part']['server']['storage'] = 's3'
 
 # S3 configuration
@@ -43,7 +44,7 @@ define tapetype #{node['amanda_part']['server']['s3']['tapetype']['name']} {
 }
 
 define changer #{node['amanda_part']['server']['s3']['tpchanger']['name']} {
-    tpchanger "chg-multi:s3:#{node['amanda_part']['server']['s3']['tpchanger']['bucket_name']}/slot-{#{s3_slots}}"
+    tpchanger "chg-multi:s3:#{node['amanda_part']['server']['s3']['tpchanger']['bucket_name']}/a/slot-{#{s3_slots}}"
     device-property "S3_ACCESS_KEY" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_access_key']}"
     device-property "S3_SECRET_KEY" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_secret_key']}"
     device-property "S3_BUCKET_LOCATION" "#{node['amanda_part']['server']['s3']['tpchanger']['s3_bucket_location']}"

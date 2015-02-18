@@ -1,5 +1,5 @@
-conf "<%= node['amanda_part']['config_name'] %>"
+conf "<%= @config['name'] %>"
 
-index_server "<%= @server %>"
-tape_server "<%= @server %>"
-tapedev "<%= node['amanda_part']['client']['tpchanger'] %>"
+index_server "<%= @server[:hostname] %>"
+tape_server "<%= @server[:hostname] %>"
+tapedev "<%= @config['tpchanger'] %>"
