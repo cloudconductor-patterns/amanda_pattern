@@ -36,7 +36,7 @@ host_backup_restore_config.each do |hostname, backup_restore_config|
         mode 0755
         recursive true
         action :create
-        not_if { server? or File.exist?(dir) }
+        only_if { server? and !File.exist?(dir) }
       end
     end
 
