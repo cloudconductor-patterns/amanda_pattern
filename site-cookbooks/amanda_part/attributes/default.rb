@@ -1,5 +1,5 @@
 default['amanda_part']['config_names'] = roles
-default['amanda_part']['execuser'] = 'root'
+default['amanda_part']['execuser'] = 'amandabackup'
 default['amanda_part']['fileuser'] = 'amandabackup'
 default['amanda_part']['filegroup'] = 'disk'
 default['amanda_part']['amanda_dir'] = '/amanda'
