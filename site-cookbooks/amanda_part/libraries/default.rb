@@ -24,9 +24,9 @@ module CloudConductor
     def role_backup_restore_config
       parameters = CloudConductorUtils::Consul.read_parameters
       parameters[:cloudconductor][:patterns].map do |_pattern_name, pattern|
-        pattern[:config].nil? or pattern[:config][:backup].nil? ? nil : pattern[:config][:backup]
-      end.compact.inject({}) do |result, config_backup_restore|
-        ::Chef::Mixin::DeepMerge.deep_merge!(config_backup_restore, result)
+        pattern[:config].nil? or pattern[:config][:backup_restore].nil? ? nil : pattern[:config][:backup_restore]
+      end.compact.inject({}) do |result, config|
+        ::Chef::Mixin::DeepMerge.deep_merge!(config, result)
       end
     end
 
@@ -74,40 +74,46 @@ module CloudConductor
       disk_postfix = path.gsub('/', '_')
       config_name = "#{hostname}#{disk_postfix}"
       {
-        'name' => config_name,
-        'hostname' => hostname,
-        'disk_postfix' => disk_postfix,
-        'config_dir' => File.join(node['amanda_part']['amanda_config_dir'], config_name),
-        'vtapes_dir' => File.join(node['amanda_part']['server']['vtapes_dir'], config_name),
-        'holding_dir' => File.join(node['amanda_part']['server']['holding_dir'], config_name),
-        'state_dir' => File.join(node['amanda_part']['server']['state_dir'], config_name),
-        'info_dir' => File.join(node['amanda_part']['server']['info_dir'], config_name),
-        'log_dir' => File.join(node['amanda_part']['server']['log_dir'], config_name),
-        'index_dir' => File.join(node['amanda_part']['server']['index_dir'], config_name),
-        'slot' => node['amanda_part']['server']['slot'],
-        'tapetype' => node['amanda_part']['server'][storage]['tapetype']['name'],
-        'tpchanger' => node['amanda_part']['server'][storage]['tpchanger']['name'],
-        'definition' => node['amanda_part']['server'][storage]['definition'],
-        'autolabel' => node['amanda_part']['server'][storage]['autolabel'],
-        'labelstr' => node['amanda_part']['server'][storage]['labelstr'],
-        'dumpcycle' => node['amanda_part']['server']['dumpcycle'],
-        'runspercycle' => node['amanda_part']['server']['runspercycle'],
-        'tapecycle' => node['amanda_part']['server']['tapecycle'],
-        'dumptype' => node['amanda_part']['server']['dumptype'],
-        'holding_name' => "#{node['amanda_part']['server']['holding_prefix']}#{config_name}",
-        'holding_use' => node['amanda_part']['server']['holding_use'],
-        'holding_chunksize' => node['amanda_part']['server']['holding_chunksize'],
-        'slot_dirs' => (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
+        name: config_name,
+        hostname: hostname,
+        disk_postfix: disk_postfix,
+        config_dir: File.join(node['amanda_part']['amanda_config_dir'], config_name),
+        vtapes_dir: File.join(node['amanda_part']['server']['vtapes_dir'], config_name),
+        holding_dir: File.join(node['amanda_part']['server']['holding_dir'], config_name),
+        state_dir: File.join(node['amanda_part']['server']['state_dir'], config_name),
+        info_dir: File.join(node['amanda_part']['server']['info_dir'], config_name),
+        log_dir: File.join(node['amanda_part']['server']['log_dir'], config_name),
+        index_dir: File.join(node['amanda_part']['server']['index_dir'], config_name),
+        slot: node['amanda_part']['server']['slot'],
+        tapetype: node['amanda_part']['server'][storage]['tapetype']['name'],
+        tpchanger: node['amanda_part']['server'][storage]['tpchanger']['name'],
+        definition: node['amanda_part']['server'][storage]['definition'],
+        autolabel: node['amanda_part']['server'][storage]['autolabel'],
+        labelstr: node['amanda_part']['server'][storage]['labelstr'],
+        dumpcycle: node['amanda_part']['server']['dumpcycle'],
+        runspercycle: node['amanda_part']['server']['runspercycle'],
+        tapecycle: node['amanda_part']['server']['tapecycle'],
+        dumptype: node['amanda_part']['server']['dumptype'],
+        holding_name: "#{node['amanda_part']['server']['holding_prefix']}#{config_name}",
+        holding_use: node['amanda_part']['server']['holding_use'],
+        holding_chunksize: node['amanda_part']['server']['holding_chunksize'],
+        slot_dirs: (1..node['amanda_part']['server']['slot']).to_a.map do |slot|
           File.join(File.join(node['amanda_part']['server']['vtapes_dir'], config_name), slot.to_s)
         end,
-        'storage' => node['amanda_part']['server']['storage']
+        storage: node['amanda_part']['server']['storage']
       }
     end
 
+    def hostname
+      `hostname`.strip
+    end
+
+    def amanda_server_name
+      server_info('backup').first[:hostname]
+    end
+
     def server?
-      hostname = `hostname`.strip
-      server = server_info('backup').first
-      server[:hostname] == hostname
+      amanda_server_name == hostname
     end
   end
 end

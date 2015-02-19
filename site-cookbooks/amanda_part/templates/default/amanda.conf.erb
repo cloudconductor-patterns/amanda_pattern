@@ -1,7 +1,7 @@
-org "<%= @config['name'] %>"
-infofile "<%= @config['info_dir'] %>"
-logdir "<%= @config['log_dir'] %>"
-indexdir "<%= @config['index_dir'] %>"
+org "<%= @config[:name] %>"
+infofile "<%= @config[:info_dir] %>"
+logdir "<%= @config[:log_dir] %>"
+indexdir "<%= @config[:index_dir] %>"
 dumpuser "<%= node['amanda_part']['user'] %>"
 
 <%= render "amanda.conf.definition.#{@config['storage']}.erb", variables: {node: node, config: @config} %>
@@ -28,17 +28,17 @@ define dumptype <%= @path_config[:dumptype] %> {
   <% end %>
 }
 
-tapetype <%= @config['tapetype'] %>
-tpchanger "<%= @config['tpchanger'] %>"
-autolabel "<%= @config['autolabel'] %>" empty VOLUME_ERROR
-labelstr "<%= @config['labelstr'] %>"
+tapetype <%= @config[:tapetype] %>
+tpchanger "<%= @config[:tpchanger] %>"
+autolabel "<%= @config[:autolabel] %>" empty VOLUME_ERROR
+labelstr "<%= @config[:labelstr] %>"
 
-dumpcycle <%= @config['dumpcycle'] %>
-runspercycle <%= @config['runspercycle'] %>
-tapecycle <%= @config['tapecycle'] %>
+dumpcycle <%= @config[:dumpcycle] %>
+runspercycle <%= @config[:runspercycle] %>
+tapecycle <%= @config[:tapecycle] %>
 
-holdingdisk <%= @config['holding_name'] %> {
-    directory "<%= @config['holding_dir'] %>"
-    use <%= @config['holding_use'] %>
-    chunksize <%= @config['holding_chunksize'] %>
+holdingdisk <%= @config[:holding_name] %> {
+    directory "<%= @config[:holding_dir] %>"
+    use <%= @config[:holding_use] %>
+    chunksize <%= @config[:holding_chunksize] %>
 }

@@ -4,6 +4,6 @@
   "chef_type": "role",
   "json_class":"Chef::Role",
   "run_list": [
-    "recipe[amanda_part::member_ready]"
+    "recipe[amanda_part::backup_ready]"
   ]
 }

@@ -34,7 +34,6 @@ directory node['amanda_part']['amanda_data_dir'] do
   not_if { server? or File.exist?(node['amanda_part']['amanda_data_dir']) }
 end
 
-server = server_info('backup').first
 amandahosts_client = File.join(node['amanda_part']['amanda_data_dir'], '.amandahosts')
 template amandahosts_client do
   owner node['amanda_part']['user']
@@ -42,7 +41,7 @@ template amandahosts_client do
   source '.amandahosts-client.erb'
   mode 0600
   variables(
-    server: server
+    amanda_server_name: amanda_server_name
   )
   not_if { server? }
 end
@@ -56,7 +55,6 @@ directory node['amanda_part']['client']['script_dir'] do
   not_if { server? or File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
-hostname = `hostname`.strip
 host_backup_restore_config[hostname].each do |path_config|
   config = amanda_config(hostname, path_config[:path])
   directory config['config_dir'] do
@@ -65,9 +63,9 @@ host_backup_restore_config[hostname].each do |path_config|
     mode 0755
     recursive true
     action :create
-    not_if { server? or File.exist?(config['config_dir']) }
+    not_if { server? or File.exist?(config[:config_dir]) }
   end
-  amanda_client_conf = File.join(config['config_dir'], 'amanda-client.conf')
+  amanda_client_conf = File.join(config[:config_dir], 'amanda-client.conf')
   template amanda_client_conf do
     owner node['amanda_part']['user']
     group node['amanda_part']['group']
