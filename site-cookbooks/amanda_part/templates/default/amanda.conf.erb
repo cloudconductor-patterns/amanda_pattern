@@ -4,7 +4,7 @@ logdir "<%= @config[:log_dir] %>"
 indexdir "<%= @config[:index_dir] %>"
 dumpuser "<%= node['amanda_part']['user'] %>"
 
-<%= render "amanda.conf.definition.#{@config['storage']}.erb", variables: {node: node, config: @config} %>
+<%= render "amanda.conf.definition.#{@config[:storage]}.erb", variables: {node: node, config: @config} %>
 
 define dumptype <%= node['amanda_part']['server']['dumptype'] %> {
     program "GNUTAR"

@@ -57,7 +57,7 @@ end
 
 host_backup_restore_config[hostname].each do |path_config|
   config = amanda_config(hostname, path_config[:path])
-  directory config['config_dir'] do
+  directory config[:config_dir] do
     owner node['amanda_part']['user']
     group node['amanda_part']['group']
     mode 0755
@@ -72,7 +72,7 @@ host_backup_restore_config[hostname].each do |path_config|
     source 'amanda-client.conf.erb'
     mode 0644
     variables(
-      server: server,
+      amanda_server_name: amanda_server_name,
       config: config
     )
     not_if { server? }
