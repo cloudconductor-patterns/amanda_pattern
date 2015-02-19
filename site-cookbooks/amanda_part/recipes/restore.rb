@@ -1,4 +1,3 @@
-hostname = `hostname`.strip
 host_backup_restore_config[hostname].each do |path_config|
   config = amanda_config(hostname, path_config[:path])
   bash "amrecover_#{config[:name]}" do
