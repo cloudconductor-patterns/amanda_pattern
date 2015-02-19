@@ -6,7 +6,7 @@ host_backup_restore_config[hostname].each do |path_config|
     amrecover -C #{config['name']} <<EOF
       setdisk #{path_config[:path]}
       lcd #{path_config[:path]}
-      add .
+      add *
       extract
       Y
       Y
