@@ -1,4 +1,4 @@
-<%= @server[:hostname] %> <%= node['amanda_part']['execuser'] %> amdump
+<%= @server[:hostname] %> <%= node['amanda_part']['user'] %> amdump
 <% @clients.each do |client| %>
 <%= client.first %> root amindexd amidxtaped
 <% end %>

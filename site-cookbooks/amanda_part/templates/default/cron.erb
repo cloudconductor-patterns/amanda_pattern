@@ -2,4 +2,4 @@ SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
 HOME=/
-<%= @schedule %> <%= node['amanda_part']['server']['execuser'] %> amdump <%= @config_name %>
+<%= @schedule %> root su - <%= node['amanda_part']['user'] %> -c "amdump <%= @config_name %>"

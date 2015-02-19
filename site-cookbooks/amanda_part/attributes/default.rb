@@ -1,7 +1,6 @@
 default['amanda_part']['config_names'] = roles
-default['amanda_part']['execuser'] = 'amandabackup'
-default['amanda_part']['fileuser'] = 'amandabackup'
-default['amanda_part']['filegroup'] = 'disk'
+default['amanda_part']['user'] = 'amandabackup'
+default['amanda_part']['group'] = 'disk'
 default['amanda_part']['amanda_dir'] = '/amanda'
 default['amanda_part']['amanda_config_dir'] = '/etc/amanda'
 default['amanda_part']['amanda_data_dir'] = '/var/lib/amanda'

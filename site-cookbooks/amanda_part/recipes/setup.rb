@@ -14,8 +14,8 @@ service 'xinetd' do
 end
 
 cookbook_file '/etc/xinetd.d/amandaserver' do
-  owner node['amanda_part']['fileuser']
-  group node['amanda_part']['fileusergroup']
+  owner node['amanda_part']['user']
+  group node['amanda_part']['group']
   source 'amandaserver'
   mode 0644
   notifies :restart, 'service[xinetd]', :immediate
