@@ -92,8 +92,8 @@ host_backup_restore_config[hostname].each do |path_config|
   end
 end
 
-ruby_block 'backup_member_ready_event' do
+ruby_block 'backup_restore_backup_ready_event' do
   block do
-    `consul event -name="backup_restore_backup_ready" "${CONSUL_SECRET_KEY}"`
+    `consul event -name="backup_ready" "${CONSUL_SECRET_KEY}"`
   end
 end
