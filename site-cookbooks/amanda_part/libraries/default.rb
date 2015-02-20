@@ -24,7 +24,7 @@ module CloudConductor
     def role_backup_restore_config
       parameters = CloudConductorUtils::Consul.read_parameters
       parameters[:cloudconductor][:patterns].map do |_pattern_name, pattern|
-        pattern[:config].nil? or pattern[:config][:backup_restore].nil? ? nil : pattern[:config][:backup_restore]
+        (pattern[:config].nil? or pattern[:config][:backup_restore].nil?) ? nil : pattern[:config][:backup_restore]
       end.compact.inject({}) do |result, config|
         ::Chef::Mixin::DeepMerge.deep_merge!(config, result)
       end
@@ -109,7 +109,7 @@ module CloudConductor
     end
 
     def amanda_server_name
-      server_info('backup').first[:hostname]
+      server_info('backup_restore').first[:hostname]
     end
 
     def server?
