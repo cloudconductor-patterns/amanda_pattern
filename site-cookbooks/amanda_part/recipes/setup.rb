@@ -20,3 +20,14 @@ cookbook_file '/etc/xinetd.d/amandaserver' do
   mode 0644
   notifies :restart, 'service[xinetd]', :immediate
 end
+
+service 'consul' do
+    supports status: true, restart: true, reload: true
+    action :nothing
+end
+
+cookbook_file '/etc/consul.d/watches_backup_restore.json' do
+  source 'watches_backup_restore.json'
+  mode 0644
+  notifies :reload, 'service[consul]', :immediate
+end

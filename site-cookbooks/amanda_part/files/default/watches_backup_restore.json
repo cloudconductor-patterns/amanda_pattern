@@ -1,0 +1,9 @@
+{
+  "watches": [
+    {
+      "type": "event",
+      "name": "backup_ready",
+      "handler": "/opt/consul/event_handlers/event-handler backup_ready"
+    }
+  ]
+}
