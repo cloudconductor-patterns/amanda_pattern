@@ -14,7 +14,7 @@ host_backup_restore_config[hostname].each do |path_config|
       amrecover = ['amrecover', '-C', "#{config[:name]}"].join(' ')
       PTY.getpty(amrecover) do |reader, writer, _pid|
         writer.sync = true
-        until (sequence.empty? or reader.eof?)
+        until sequence.empty? || reader.eof?
           reader.expect(/(>|\?) $/, 60) do |match|
             break unless match
             case match[1]

@@ -22,10 +22,11 @@ require 'cloud_conductor_utils/consul'
 module CloudConductor
   module AmandaPartHelper
     def role_backup_restore_config
-      parameters = CloudConductorUtils::Consul.read_parameters
-      parameters[:cloudconductor][:patterns].map do |_pattern_name, pattern|
-        (pattern[:config].nil? or pattern[:config][:backup_restore].nil?) ? nil : pattern[:config][:backup_restore]
-      end.compact.inject({}) do |result, config|
+      patterns = CloudConductorUtils::Consul.read_parameters[:cloudconductor][:patterns]
+      patterns_backup_restore_config = patterns.map do |_pattern_name, pattern|
+        (pattern[:config].nil? || pattern[:config][:backup_restore].nil?) ? nil : pattern[:config][:backup_restore]
+      end.compact
+      patterns_backup_restore_config.inject({}) do |result, config|
         ::Chef::Mixin::DeepMerge.deep_merge!(config, result)
       end
     end
@@ -39,12 +40,12 @@ module CloudConductor
             postfix = "#{hostname}#{path_config[:path].gsub('/', '_')}"
             schedule = path_config[:schedule]
             scripts = path_config[:script].nil? ? {} : path_config[:script].inject({}) do |script_config, (script_name, script)|
-              script_config.merge!({
+              script_config.merge!(
                 "#{script_name}_#{postfix}" => {
                   timing: script_timing[script_name],
                   script: script
                 }
-              })
+              )
             end
             dumptype = "dumptype_#{postfix}"
             {
