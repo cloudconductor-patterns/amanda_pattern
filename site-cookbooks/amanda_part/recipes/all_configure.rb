@@ -52,7 +52,7 @@ directory node['amanda_part']['client']['script_dir'] do
   mode 0755
   recursive true
   action :create
-  not_if { server? or File.exist?(node['amanda_part']['client']['script_dir']) }
+  not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
 host_backup_restore_config[hostname].each do |path_config|
@@ -87,7 +87,6 @@ host_backup_restore_config[hostname].each do |path_config|
       variables(
         script: script_config[:script]
       )
-      not_if { server? }
     end
   end
 end
