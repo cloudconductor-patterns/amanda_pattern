@@ -12,7 +12,7 @@ template amandahosts do
 end
 
 host_config.each do |hostname, backup_restore_config|
-  backup_restore_config.each do |path_config|
+  backup_restore_config[:paths].each do |path_config|
     config = amanda_config(hostname, path_config[:path])
     [
       node['amanda_part']['amanda_dir'],

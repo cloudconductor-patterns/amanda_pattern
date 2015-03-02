@@ -55,9 +55,9 @@ directory node['amanda_part']['client']['script_dir'] do
   not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
-host_backup_restore_config = host_config[hostname]
+host_backup_restore_config = host_config[current_hostname]
 host_backup_restore_config[:paths].each do |path_config|
-  config = amanda_config(hostname, path_config[:path])
+  config = amanda_config(current_hostname, path_config[:path])
   directory config[:config_dir] do
     owner node['amanda_part']['user']
     group node['amanda_part']['group']

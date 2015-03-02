@@ -21,29 +21,29 @@ require 'cloud_conductor_utils/consul'
 module CloudConductor
   module AmandaPartHelper
     def host_config
-      CloudConductorUtils::Consul.read_servers.inject({}) do |host_config, (hostname, server_info)|
-        host_config.merge(hostname => host_role_config(hostname, server_info))
+      CloudConductorUtils::Consul.read_servers.inject({}) do |result, (hostname, server_info)|
+        result.merge(hostname => host_role_config(hostname, server_info))
       end
     end
 
     def host_role_config(hostname, server_info)
-      role_config.inject({}) do |host_role_config, (role, role_parameter)|
-        next host_role_config unless server_info[:roles].include?(role.to_s)
+      role_config.inject({}) do |result, (role, role_parameter)|
+        next result unless server_info[:roles].include?(role.to_s)
         ::Chef::Mixin::DeepMerge.deep_merge!(
           {
             paths: paths_config(hostname, role_parameter[:paths]),
             privileges: role_parameter[:privileges].nil? ? [] : role_parameter[:privileges]
           },
-          host_role_config
+          result
         )
       end
     end
 
     def role_config
       patterns = CloudConductorUtils::Consul.read_parameters[:cloudconductor][:patterns]
-      patterns.inject({}) do |role_config, (_pattern_name, pattern)|
-        next role_config if pattern[:config].nil? || pattern[:config][:backup_restore].nil?
-        ::Chef::Mixin::DeepMerge.deep_merge!(pattern[:config][:backup_restore], role_config)
+      patterns.inject({}) do |result, (_pattern_name, pattern)|
+        next result if pattern[:config].nil? || pattern[:config][:backup_restore].nil?
+        ::Chef::Mixin::DeepMerge.deep_merge!(pattern[:config][:backup_restore], result)
       end
     end
 
@@ -119,7 +119,7 @@ module CloudConductor
     end
     # rubocop: enable MethodLength
 
-    def hostname
+    def current_hostname
       `hostname`.strip
     end
 
@@ -128,7 +128,7 @@ module CloudConductor
     end
 
     def server?
-      amanda_server_name == hostname
+      amanda_server_name == current_hostname
     end
   end
 end
