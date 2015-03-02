@@ -11,7 +11,7 @@ template amandahosts do
   only_if { server? }
 end
 
-host_backup_restore_config.each do |hostname, backup_restore_config|
+host_config.each do |hostname, backup_restore_config|
   backup_restore_config.each do |path_config|
     config = amanda_config(hostname, path_config[:path])
     [
