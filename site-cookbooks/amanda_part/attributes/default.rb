@@ -17,7 +17,7 @@ default['amanda_part']['server']['holding_prefix'] = 'hd_'
 default['amanda_part']['server']['holding_use'] = '2 mbytes'
 default['amanda_part']['server']['holding_chunksize'] = '1 mbyte'
 default['amanda_part']['server']['slot'] = 8
-default['amanda_part']['server']['schedule'] = '0 0 0 * *'
+default['amanda_part']['server']['schedule'] = '0 0 * * *'
 default['amanda_part']['server']['storage'] = 's3'
 
 # S3 configuration
