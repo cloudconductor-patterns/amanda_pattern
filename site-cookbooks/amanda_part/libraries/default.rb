@@ -22,17 +22,18 @@ module CloudConductor
   module AmandaPartHelper
     def host_config
       CloudConductorUtils::Consul.read_servers.inject({}) do |host_config, (hostname, server_info)|
-        host_config.merge(hostname => host_role_config)
+        host_config.merge(hostname => host_role_config(server_info))
       end
     end
 
-    def host_role_config
+    def host_role_config(server_info)
       role_config.inject([]) do |host_role_config, (role, paths_parameter)|
-      next host_role_config unless server_info[:roles].include?(role.to_s)
-      paths_config = paths_parameter.map do |path_parameter|
-        path_parameter[:path].nil? ? nil : path_config(path_parameter)
-      end.compact
-      host_role_config.concat(paths_config)
+        next host_role_config unless server_info[:roles].include?(role.to_s)
+        paths_config = paths_parameter.map do |path_parameter|
+          path_parameter[:path].nil? ? nil : path_config(path_parameter)
+        end.compact
+        host_role_config.concat(paths_config)
+      end
     end
 
     def role_config
