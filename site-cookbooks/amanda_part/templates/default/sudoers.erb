@@ -1,0 +1,3 @@
+<% @privileges_config.each do |privilege_config| %>
+  <%= "#{node['amanda_part']['user']} ALL=(#{privilege_config[:user]}) NOPASSWD: #{privilege_config[:command]}" %>
+<% end %>
