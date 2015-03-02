@@ -82,6 +82,7 @@ module CloudConductor
       }
     end
 
+    # rubocop: disable MethodLength
     def amanda_config(hostname, path)
       storage = node['amanda_part']['server']['storage']
       disk_postfix = path.gsub('/', '_')
@@ -116,6 +117,7 @@ module CloudConductor
         storage: node['amanda_part']['server']['storage']
       }
     end
+    # rubocop: enable MethodLength
 
     def hostname
       `hostname`.strip
