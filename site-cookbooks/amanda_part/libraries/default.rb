@@ -22,15 +22,15 @@ module CloudConductor
   module AmandaPartHelper
     def host_config
       CloudConductorUtils::Consul.read_servers.inject({}) do |host_config, (hostname, server_info)|
-        host_config.merge(hostname => host_role_config(server_info))
+        host_config.merge(hostname => host_role_config(hostname, server_info))
       end
     end
 
-    def host_role_config(server_info)
+    def host_role_config(hostname, server_info)
       role_config.inject([]) do |host_role_config, (role, paths_parameter)|
         next host_role_config unless server_info[:roles].include?(role.to_s)
         paths_config = paths_parameter.map do |path_parameter|
-          path_parameter[:path].nil? ? nil : path_config(path_parameter)
+          path_parameter[:path].nil? ? nil : path_config(hostname, path_parameter)
         end.compact
         host_role_config.concat(paths_config)
       end
@@ -44,7 +44,7 @@ module CloudConductor
       end
     end
 
-    def path_config(path_parameter)
+    def path_config(hostname, path_parameter)
       postfix = "#{hostname}#{path_parameter[:path].gsub('/', '_')}"
       schedule = path_parameter[:schedule]
       scripts = path_parameter[:script].nil? ? {} : path_parameter[:script].inject({}) do |script_config, (script_name, script)|
