@@ -1,5 +1,5 @@
-host_config[hostname].each do |path_config|
-  config = amanda_config(hostname, path_config[:path])
+host_config[current_hostname][:paths].each do |path_config|
+  config = amanda_config(current_hostname, path_config[:path])
   ruby_block "amrecover_#{config[:name]}" do
     block do
       require 'pty'
