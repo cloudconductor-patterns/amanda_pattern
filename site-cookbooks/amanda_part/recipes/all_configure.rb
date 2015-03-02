@@ -98,6 +98,7 @@ template '/etc/sudoers.d/cloudconductor' do
   source 'sudoers.erb'
   mode 0600
   variables(
+    hostname: current_hostname,
     privileges_config: host_backup_restore_config[:privileges]
   )
 end
