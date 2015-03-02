@@ -32,7 +32,7 @@ module CloudConductor
         ::Chef::Mixin::DeepMerge.deep_merge!(
           {
             paths: paths_config(hostname, role_parameter[:paths]),
-            privileges: role_parameter[:privileges]
+            privileges: role_parameter[:privileges].nil? ? [] : role_parameter[:privileges]
           },
           host_role_config
         )

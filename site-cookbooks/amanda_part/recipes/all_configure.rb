@@ -55,7 +55,8 @@ directory node['amanda_part']['client']['script_dir'] do
   not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
-host_config[hostname].each do |path_config|
+host_backup_restore_config = host_config[hostname]
+host_backup_restore_config[:paths].each do |path_config|
   config = amanda_config(hostname, path_config[:path])
   directory config[:config_dir] do
     owner node['amanda_part']['user']
@@ -89,6 +90,16 @@ host_config[hostname].each do |path_config|
       )
     end
   end
+end
+
+template '/etc/sudoers.d/cloudconductor' do
+  owner 'root'
+  group 'root'
+  source 'sudoers.erb'
+  mode 0600
+  variables(
+    privileges_config: host_backup_restore_config[:privileges]
+  )
 end
 
 ruby_block 'backup_restore_backup_ready_event' do
