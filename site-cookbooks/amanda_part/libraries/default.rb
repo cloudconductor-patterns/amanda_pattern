@@ -16,49 +16,51 @@
 require 'chef/recipe'
 require 'chef/resource'
 require 'chef/provider'
-
 require 'cloud_conductor_utils/consul'
 
 module CloudConductor
   module AmandaPartHelper
-    def role_backup_restore_config
-      patterns = CloudConductorUtils::Consul.read_parameters[:cloudconductor][:patterns]
-      patterns_backup_restore_config = patterns.map do |_pattern_name, pattern|
-        (pattern[:config].nil? || pattern[:config][:backup_restore].nil?) ? nil : pattern[:config][:backup_restore]
-      end.compact
-      patterns_backup_restore_config.inject({}) do |result, config|
-        ::Chef::Mixin::DeepMerge.deep_merge!(config, result)
+    def host_config
+      CloudConductorUtils::Consul.read_servers.inject({}) do |host_config, (hostname, server_info)|
+        host_config.merge(hostname => host_role_config)
       end
     end
 
-    def host_backup_restore_config
-      CloudConductorUtils::Consul.read_servers.inject({}) do |hosts_config, (hostname, server)|
-        host_config = role_backup_restore_config.inject([]) do |host_role_config, (role, paths_config)|
-          next host_role_config unless server[:roles].include?(role.to_s)
-          host_role_paths_config = paths_config.map do |path_config|
-            next if path_config[:path].nil?
-            postfix = "#{hostname}#{path_config[:path].gsub('/', '_')}"
-            schedule = path_config[:schedule]
-            scripts = path_config[:script].nil? ? {} : path_config[:script].inject({}) do |script_config, (script_name, script)|
-              script_config.merge!(
-                "#{script_name}_#{postfix}" => {
-                  timing: script_timing[script_name],
-                  script: script
-                }
-              )
-            end
-            dumptype = "dumptype_#{postfix}"
-            {
-              path: path_config[:path],
-              schedule: schedule.nil? ? node['amanda_part']['server']['schedule'] : schedule,
-              scripts: scripts,
-              dumptype: dumptype
-            }
-          end.compact
-          host_role_config.concat(host_role_paths_config)
-        end
-        hosts_config.merge!(hostname => host_config)
+    def host_role_config
+      role_config.inject([]) do |host_role_config, (role, paths_parameter)|
+      next host_role_config unless server_info[:roles].include?(role.to_s)
+      paths_config = paths_parameter.map do |path_parameter|
+        path_parameter[:path].nil? ? nil : path_config(path_parameter)
+      end.compact
+      host_role_config.concat(paths_config)
+    end
+
+    def role_config
+      patterns = CloudConductorUtils::Consul.read_parameters[:cloudconductor][:patterns]
+      patterns.inject({}) do |role_config, (_pattern_name, pattern)|
+        next role_config if pattern[:config].nil? || pattern[:config][:backup_restore].nil?
+        ::Chef::Mixin::DeepMerge.deep_merge!(pattern[:config][:backup_restore], role_config)
       end
+    end
+
+    def path_config(path_parameter)
+      postfix = "#{hostname}#{path_parameter[:path].gsub('/', '_')}"
+      schedule = path_parameter[:schedule]
+      scripts = path_parameter[:script].nil? ? {} : path_parameter[:script].inject({}) do |script_config, (script_name, script)|
+        script_config.merge(
+          "#{script_name}_#{postfix}" => {
+            timing: script_timing[script_name],
+            script: script
+          }
+        )
+      end
+      dumptype = "dumptype_#{postfix}"
+      {
+        path: path_parameter[:path],
+        schedule: schedule.nil? ? node['amanda_part']['server']['schedule'] : schedule,
+        scripts: scripts,
+        dumptype: dumptype
+      }
     end
 
     def script_timing
