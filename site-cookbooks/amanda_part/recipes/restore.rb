@@ -1,4 +1,4 @@
-host_backup_restore_config[hostname].each do |path_config|
+host_config[hostname].each do |path_config|
   config = amanda_config(hostname, path_config[:path])
   ruby_block "amrecover_#{config[:name]}" do
     block do
