@@ -1,1 +1,3 @@
-<%= @hostname %> <%= @path_config[:path] %> <%= @path_config[:dumptype] %>
+<% @hosts.each do |hostname| %>
+<%= hostname %> <%= @path_config[:path] %> <%= @path_config[:dumptype] %>
+<% end %>

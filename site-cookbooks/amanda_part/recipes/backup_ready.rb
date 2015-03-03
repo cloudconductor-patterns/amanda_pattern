@@ -11,9 +11,9 @@ template amandahosts do
   only_if { server? }
 end
 
-host_config.each do |hostname, backup_restore_config|
-  backup_restore_config[:paths].each do |path_config|
-    config = amanda_config(hostname, path_config[:path])
+role_host_config.each do |role, role_host_backup_restore_config|
+  role_host_backup_restore_config[:paths].each do |path_config|
+    config = amanda_config(role, path_config[:path])
     [
       node['amanda_part']['amanda_dir'],
       node['amanda_part']['amanda_config_dir'],
@@ -42,7 +42,7 @@ host_config.each do |hostname, backup_restore_config|
       source 'disklist.erb'
       mode 0644
       variables(
-        hostname: hostname,
+        hosts: role_host_backup_restore_config[:hosts],
         path_config: path_config
       )
       only_if { server? }
