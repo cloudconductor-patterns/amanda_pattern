@@ -27,11 +27,11 @@ module CloudConductor
     end
 
     def host_role_config(hostname, server_info)
-      role_config.inject({}) do |result, (role, role_parameter)|
+      role_config.inject({paths: [], privileges: []}) do |result, (role, role_parameter)|
         next result unless server_info[:roles].include?(role.to_s)
         ::Chef::Mixin::DeepMerge.deep_merge!(
           {
-            paths: paths_config(hostname, role_parameter[:paths]),
+            paths: role_parameter[:paths].nil? ? [] : paths_config(hostname, role_parameter[:paths]),
             privileges: role_parameter[:privileges].nil? ? [] : role_parameter[:privileges]
           },
           result
