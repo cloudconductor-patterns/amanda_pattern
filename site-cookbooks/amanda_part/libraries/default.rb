@@ -140,16 +140,12 @@ module CloudConductor
     end
     # rubocop: enable MethodLength
 
-    def current_hostname
-      `hostname`.strip
-    end
-
     def amanda_server_name
       server_info('backup_restore').first[:hostname]
     end
 
-    def server?
-      amanda_server_name == current_hostname
+    def amanda_server?
+      amanda_server_name == node['hostname']
     end
   end
 end
