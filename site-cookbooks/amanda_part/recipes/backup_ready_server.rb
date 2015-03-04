@@ -5,7 +5,7 @@ template amandahosts do
   source '.amandahosts-server.erb'
   mode 0600
   variables(
-    amanda_server_name: amanda_server_name,
+    amanda_server_ip: amanda_server_ip,
     amanda_clients: CloudConductorUtils::Consul.read_servers
   )
 end

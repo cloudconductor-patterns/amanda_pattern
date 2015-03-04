@@ -53,8 +53,8 @@ module CloudConductor
     end
 
     def target_hosts(role, servers)
-      servers.map do |hostname, server_info|
-        server_info[:roles].include?(role.to_s) ? hostname : nil
+      servers.map do |_hostname, server_info|
+        server_info[:roles].include?(role.to_s) ? server_info[:private_ip] : nil
       end.compact
     end
 
@@ -104,13 +104,13 @@ module CloudConductor
     end
 
     # rubocop: disable MethodLength
-    def amanda_config(hostname, path)
+    def amanda_config(role, path)
       storage = node['amanda_part']['server']['storage']
       disk_postfix = path.gsub('/', '_')
-      config_name = "#{hostname}#{disk_postfix}"
+      config_name = "#{role}#{disk_postfix}"
       {
         name: config_name,
-        hostname: hostname,
+        role: role,
         disk_postfix: disk_postfix,
         config_dir: File.join(node['amanda_part']['amanda_config_dir'], config_name),
         vtapes_dir: File.join(node['amanda_part']['server']['vtapes_dir'], config_name),
@@ -144,8 +144,20 @@ module CloudConductor
       server_info('backup_restore').first[:hostname]
     end
 
+    def amanda_server_ip
+      CloudConductorUtils::Consul.read_servers.map do |hostname, server_info|
+        amanda_server_name == hostname ? server_info[:private_ip] : nil
+      end.compact.first
+    end
+
     def amanda_server?
       amanda_server_name == node['hostname']
+    end
+
+    def host_private_ip
+      CloudConductorUtils::Consul.read_servers.map do |hostname, server_info|
+        node['hostname'] == hostname ? server_info[:private_ip] : nil
+      end.compact.first
     end
   end
 end

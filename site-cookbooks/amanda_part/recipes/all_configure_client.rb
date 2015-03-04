@@ -37,7 +37,7 @@ template amandahosts_client do
   source '.amandahosts-client.erb'
   mode 0600
   variables(
-    amanda_server_name: amanda_server_name
+    amanda_server_ip: amanda_server_ip
   )
 end
 
@@ -59,7 +59,7 @@ host_config.each do |role, role_config|
       source 'amanda-client.conf.erb'
       mode 0644
       variables(
-        amanda_server_name: amanda_server_name,
+        amanda_server_ip: amanda_server_ip,
         config: config
       )
     end
