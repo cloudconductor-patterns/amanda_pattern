@@ -20,13 +20,13 @@
       "AllowedPattern" : "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription" : "must be a valid IP CIDR range of the form x.x.x.x/x."
     },
-    "backupInstanceType" : {
-      "Description" : "BackupServer instance type",
+    "BackupRestoreInstanceType" : {
+      "Description" : "BackupRestoreServer instance type",
       "Type" : "String",
       "Default" : "t2.small"
     },
-    "backupImageId" : {
-      "Description" : "[computed] BackupServer Image Id. This parameter is automatically filled by CloudConductor.",
+    "BackupRestoreImageId" : {
+      "Description" : "[computed] BackupRestoreServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "VpcId" : {
@@ -65,29 +65,29 @@
 
   "Resources" : {
 
-    "BackupServer" : {
+    "BackupRestoreServer" : {
       "Type" : "AWS::EC2::Instance",
       "Metadata" : {
-        "Role" : "backup"
+        "Role" : "backup_restore"
       },
       "Properties" : {
-        "ImageId" : { "Ref" : "backupImageId" },
-        "InstanceType" : { "Ref" : "backupInstanceType" },
+        "ImageId" : { "Ref" : "BackupRestoreImageId" },
+        "InstanceType" : { "Ref" : "BackupRestoreInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
-           "NetworkInterfaceId" : { "Ref" : "backupNetworkInterface" }
+           "NetworkInterfaceId" : { "Ref" : "BackupRestoreNetworkInterface" }
         }],
         "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/sh -v\n",
           "# Helper function\n",
           "function error_exit\n",
           "{\n",
-          "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "BackupWaitHandle" }, "'\n",
+          "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "BackupRestoreWaitHandle" }, "'\n",
           "  exit 1\n",
           "}\n",
           "# Set Parameters\n",
-          "/bin/echo 'ROLE=backup' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'ROLE=backup_restore' >> /opt/cloudconductor/config\n",
           "/bin/echo 'JOIN_ADDRESS=", { "Ref" : "ClusterAddress" }, "' >> /opt/cloudconductor/config\n",
           "# Run Consul\n",
           "# this process is required because of init sequence.\n",
@@ -97,21 +97,21 @@
           "for i in `seq 10`; do\n",
           "  if [ ! -z \"`/usr/local/bin/consul members | grep ${host_name}`\" ]; then\n",
           "    # Send success signal\n",
-          "    /opt/aws/bin/cfn-signal -e 0 -r 'BackupServer Setup complete' '", { "Ref" : "BackupWaitHandle" }, "'\n",
+          "    /opt/aws/bin/cfn-signal -e 0 -r 'BackupRestoreServer Setup complete' '", { "Ref" : "BackupRestoreWaitHandle" }, "'\n",
           "    exit 0\n",
           "  fi\n",
           "  sleep 1\n",
           "done\n",
-          "/opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "BackupWaitHandle" }, "'\n",
+          "/opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "BackupRestoreWaitHandle" }, "'\n",
           "exit 1\n"
         ]]}},
-        "Tags" : [{"Key": "Name", "Value": "BackupServer"}, {"Key": "Role", "Value": "backup"}]
+        "Tags" : [{"Key": "Name", "Value": "BackupRestoreServer"}, {"Key": "Role", "Value": "backup_restore"}]
       }
     },
-    "BackupNetworkInterface" : {
+    "BackupRestoreNetworkInterface" : {
       "Type" : "AWS::EC2::NetworkInterface",
       "Properties" : {
-        "GroupSet" : [{"Ref" : "BackupSecurityGroup"}],
+        "GroupSet" : [{"Ref" : "BackupRestoreSecurityGroup"}],
         "SubnetId" : { "Ref" : "SubnetId" }
       }
     },
@@ -125,10 +125,10 @@
       "Type" : "AWS::EC2::EIPAssociation",
       "Properties" : {
         "AllocationId" : { "Fn::GetAtt" : [ "FrontendEIP", "AllocationId" ]},
-        "NetworkInterfaceId" : { "Ref" : "BackupNetworkInterface" }
+        "NetworkInterfaceId" : { "Ref" : "BackupRestoreNetworkInterface" }
       }
     },
-    "BackupSecurityGroup" : {
+    "BackupRestoreSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
         "GroupDescription" : "Enable amanda access",
@@ -139,14 +139,14 @@
         ]
       }
     },
-    "BackupWaitHandle" : {
+    "BackupRestoreWaitHandle" : {
       "Type" : "AWS::CloudFormation::WaitConditionHandle"
     },
-    "BackupWaitCondition" : {
+    "BackupRestoreWaitCondition" : {
       "Type" : "AWS::CloudFormation::WaitCondition",
-      "DependsOn" : "BackupServer",
+      "DependsOn" : "BackupRestoreServer",
       "Properties" : {
-        "Handle" : { "Ref" : "BackupWaitHandle" },
+        "Handle" : { "Ref" : "BackupRestoreWaitHandle" },
         "Timeout" : "600"
       }
     }
