@@ -1,8 +1,9 @@
 default['amanda_part']['user'] = 'amandabackup'
 default['amanda_part']['group'] = 'disk'
-default['amanda_part']['amanda_dir'] = '/amanda'
 default['amanda_part']['amanda_config_dir'] = '/etc/amanda'
 default['amanda_part']['amanda_data_dir'] = '/var/lib/amanda'
+default['amanda_part']['amanda_dir'] = node['amanda_part']['amanda_data_dir']
+default['amanda_part']['event_handler'] = '/opt/consul/event_handlers/event-handler'
 default['amanda_part']['server']['vtapes_dir'] = File.join(node['amanda_part']['amanda_dir'], 'vtapes')
 default['amanda_part']['server']['holding_dir'] = File.join(node['amanda_part']['amanda_dir'], 'holding')
 default['amanda_part']['server']['state_dir'] = File.join(node['amanda_part']['amanda_dir'], 'state')

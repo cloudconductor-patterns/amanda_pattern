@@ -60,7 +60,7 @@ role_host_config.each do |role, role_host_backup_restore_config|
 
     cron_conf = File.join('/etc/cron.d', config[:name])
     template cron_conf do
-      owner node['amanda_part']['execuser']
+      owner 'root'
       source 'cron.erb'
       mode 0644
       variables(
