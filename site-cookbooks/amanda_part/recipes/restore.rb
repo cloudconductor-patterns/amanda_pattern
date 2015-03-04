@@ -16,9 +16,17 @@ roles.each do |role|
         amrecover = ['amrecover', '-C', "#{config[:name]}"].join(' ')
         PTY.getpty(amrecover) do |reader, writer, _pid|
           writer.sync = true
+          reader.expect(/> $/, 60) do |match|
+            exit 1 unless match
+            writer.puts 'listhost'
+          end
+          reader.expect(/\n(201- .*)\n/, 60) do |match|
+            exit 1 unless match
+            sequence.unshift("sethost #{match[1].split(' ')[1]}")
+          end
           until sequence.empty? || reader.eof?
             reader.expect(/(>|\?) $/, 60) do |match|
-              break unless match
+              exit 1 unless match
               case match[1]
               when />/
                 command = sequence.shift
