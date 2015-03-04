@@ -30,6 +30,7 @@ roles.each do |role|
           end
         end
       end
+      only_if { path_config[:restore_enabled] }
     end
   end
 end
