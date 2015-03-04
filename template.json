@@ -111,7 +111,7 @@
     "BackupRestoreNetworkInterface" : {
       "Type" : "AWS::EC2::NetworkInterface",
       "Properties" : {
-        "GroupSet" : [{"Ref" : "BackupRestoreSecurityGroup"}],
+        "GroupSet" : [{"Ref" : "SharedSecurityGroup"}, {"Ref" : "BackupRestoreSecurityGroup"}],
         "SubnetId" : { "Ref" : "SubnetId" }
       }
     },
@@ -134,9 +134,29 @@
         "GroupDescription" : "Enable amanda access",
         "VpcId" : { "Ref" : "VpcId" },
         "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "10080", "ToPort" : "10080", "CidrIp" : "10.0.0.0/16"},
+          {"IpProtocol" : "tcp", "FromPort" : "10080", "ToPort" : "10083", "CidrIp" : "10.0.0.0/16"},
           {"IpProtocol" : "tcp", "FromPort" : "571", "ToPort" : "571", "CidrIp" : "10.0.0.0/16"}
         ]
+      }
+    },
+    "SharedSecurityGroupInboundRuleAmanda": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties":{
+        "IpProtocol": "tcp",
+        "FromPort": "10080",
+        "ToPort": "10083",
+        "SourceSecurityGroupId": { "Ref" : "BackupRestoreSecurityGroup" },
+        "GroupId": { "Ref" : "SharedSecurityGroup" }
+      }
+    },
+    "SharedSecurityGroupInboundRuleMeter": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties":{
+        "IpProtocol": "tcp",
+        "FromPort": "571",
+        "ToPort": "571",
+        "SourceSecurityGroupId": { "Ref" : "BackupRestoreSecurityGroup" },
+        "GroupId": { "Ref" : "SharedSecurityGroup" }
       }
     },
     "BackupRestoreWaitHandle" : {
