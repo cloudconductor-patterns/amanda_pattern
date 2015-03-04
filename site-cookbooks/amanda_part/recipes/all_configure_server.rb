@@ -29,7 +29,7 @@ host_config.each do |role, role_config|
     source 'sudoers.erb'
     mode 0600
     variables(
-      hostname: current_hostname,
+      hostname: node['hostname'],
       privileges_config: role_config[:privileges]
     )
   end
