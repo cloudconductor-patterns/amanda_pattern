@@ -1,12 +1,3 @@
-directory node['amanda_part']['client']['script_dir'] do
-  owner node['amanda_part']['user']
-  group node['amanda_part']['group']
-  mode 0755
-  recursive true
-  action :create
-  not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
-end
-
 host_config.each do |role, role_config|
   role_config[:paths].each do |path_config|
     config = amanda_config(role, path_config[:path])
@@ -32,11 +23,5 @@ host_config.each do |role, role_config|
       hostname: node['hostname'],
       privileges_config: role_config[:privileges]
     )
-  end
-end
-
-ruby_block 'backup_restore_backup_ready_event' do
-  block do
-    `consul event -name="backup_ready" "${CONSUL_SECRET_KEY}"`
   end
 end
