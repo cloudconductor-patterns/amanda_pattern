@@ -26,8 +26,8 @@ service 'consul' do
   action :nothing
 end
 
-cookbook_file '/etc/consul.d/watches_backup_restore.json' do
-  source 'watches_backup_restore.json'
+template '/etc/consul.d/watches_backup_restore.json' do
+  source 'watches_backup_restore.json.erb'
   mode 0644
   notifies :reload, 'service[consul]', :immediate
 end
