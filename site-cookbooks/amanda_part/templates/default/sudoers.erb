@@ -1,3 +1,4 @@
+Defaults !requiretty
 <% @privileges_config.each do |privilege_config| %>
-  <%= "#{node['amanda_part']['user']} #{@hostname}=(#{privilege_config[:user]}) NOPASSWD: #{privilege_config[:command]}" %>
+<%= "#{node['amanda_part']['user']} #{@hostname}=(#{privilege_config[:user]}) NOPASSWD: #{privilege_config[:command]}" %>
 <% end %>
