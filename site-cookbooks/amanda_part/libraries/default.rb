@@ -106,7 +106,7 @@ module CloudConductor
     # rubocop: disable MethodLength
     def amanda_config(role, path)
       storage = node['amanda_part']['server']['storage']
-      disk_postfix = path.gsub('/', '_')
+      disk_postfix = path.gsub('/', '_').gsub('.', '_')
       config_name = "#{role}#{disk_postfix}"
       {
         name: config_name,
