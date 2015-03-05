@@ -76,6 +76,7 @@ module CloudConductor
       postfix = "#{role}#{path_parameter[:path].gsub('/', '_').gsub('.', '_')}"
       schedule = path_parameter[:schedule]
       restore_enabled = path_parameter[:restore_enabled]
+      prepare_path = path_parameter[:prepare_path]
       scripts = path_parameter[:script].nil? ? {} : path_parameter[:script].inject({}) do |script_config, (script_name, script)|
         script_config.merge(
           "#{script_name}_#{postfix}" => {
@@ -89,6 +90,7 @@ module CloudConductor
         path: path_parameter[:path],
         schedule: schedule.nil? ? node['amanda_part']['server']['schedule'] : schedule,
         restore_enabled: restore_enabled.nil? ? false : restore_enabled,
+        prepare_path: prepare_path.nil? ? false : prepare_path,
         scripts: scripts,
         dumptype: dumptype
       }

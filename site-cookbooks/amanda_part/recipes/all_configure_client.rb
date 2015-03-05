@@ -74,6 +74,14 @@ host_config.each do |role, role_config|
           script: script_config[:script]
         )
       end
+      directory path_config[:path] do
+        owner node['amanda_part']['user']
+        group node['amanda_part']['group']
+        mode 0777
+        recursive true
+        action :create
+        only_if { path_config[:prepare_path] && !File.exist?(path_config[:path]) }
+      end
     end
   end
   template "/etc/sudoers.d/backup_restore_#{role}" do
