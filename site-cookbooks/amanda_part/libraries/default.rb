@@ -53,9 +53,9 @@ module CloudConductor
     end
 
     def target_hosts(role, servers)
-      servers.map do |hostname, server_info|
-        server_info[:roles].include?(role.to_s) ? {hostname: hostname, private_ip: server_info[:private_ip]} : nil
-      end.compact
+      servers.select do |hostname, server_info|
+        server_info[:roles].include?(role.to_s)
+      end
     end
 
     def role_config
