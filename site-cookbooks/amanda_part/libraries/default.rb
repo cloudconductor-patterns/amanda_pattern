@@ -53,8 +53,8 @@ module CloudConductor
     end
 
     def target_hosts(role, servers)
-      servers.map do |_hostname, server_info|
-        server_info[:roles].include?(role.to_s) ? server_info[:private_ip] : nil
+      servers.map do |hostname, server_info|
+        server_info[:roles].include?(role.to_s) ? {hostname: hostname, private_ip: server_info[:private_ip]} : nil
       end.compact
     end
 
@@ -140,18 +140,12 @@ module CloudConductor
     end
     # rubocop: enable MethodLength
 
-    def amanda_server_name
-      server_info('backup_restore').first[:hostname]
-    end
-
-    def amanda_server_ip
-      CloudConductorUtils::Consul.read_servers.map do |hostname, server_info|
-        amanda_server_name == hostname ? server_info[:private_ip] : nil
-      end.compact.first
+    def amanda_server
+      server_info('backup_restore').first
     end
 
     def amanda_server?
-      amanda_server_name == node['hostname']
+      amanda_server[:hostname] == node['hostname']
     end
 
     def host_private_ip

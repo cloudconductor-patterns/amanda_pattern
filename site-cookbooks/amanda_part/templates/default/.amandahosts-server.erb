@@ -1,5 +1,7 @@
-<%= @amanda_server_ip %> <%= node['amanda_part']['user'] %> amdump
-<% @amanda_clients.each do |_hostname, amanda_client| %>
+<%= @amanda_server[:hostname] %> <%= node['amanda_part']['user'] %> amdump
+<%= @amanda_server[:private_ip] %> <%= node['amanda_part']['user'] %> amdump
+<% @amanda_clients.each do |hostname, amanda_client| %>
+<%= hostname %> root amindexd amidxtaped
 <%= amanda_client[:private_ip] %> root amindexd amidxtaped
 <% end %>
 localhost root amindexd amidxtaped
