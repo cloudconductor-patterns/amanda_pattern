@@ -1,6 +1,6 @@
 roles = ENV['ROLE'].split(',')
 roles.each do |role|
-  continue if host_config[role.to_sym].nil?
+  next if host_config[role.to_sym].nil?
   host_config[role.to_sym][:paths].each do |path_config|
     config = amanda_config(role, path_config[:path])
     ruby_block "amrecover_#{config[:name]}" do
