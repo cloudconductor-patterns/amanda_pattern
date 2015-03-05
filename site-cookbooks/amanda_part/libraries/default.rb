@@ -73,7 +73,7 @@ module CloudConductor
     end
 
     def path_config(role, path_parameter)
-      postfix = "#{role}#{path_parameter[:path].gsub('/', '_')}"
+      postfix = "#{role}#{path_parameter[:path].gsub('/', '_').gsub('.', '_')}"
       schedule = path_parameter[:schedule]
       restore_enabled = path_parameter[:restore_enabled]
       scripts = path_parameter[:script].nil? ? {} : path_parameter[:script].inject({}) do |script_config, (script_name, script)|
