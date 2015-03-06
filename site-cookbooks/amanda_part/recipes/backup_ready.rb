@@ -9,8 +9,8 @@ template amandahosts do
     amanda_clients: CloudConductorUtils::Consul.read_servers
   )
 end
+
 parameters = CloudConductorUtils::Consul.read_parameters[:cloudconductor]
-#puts hosts_paths_privileges_by_role([:web, :ap, :db], parameters)
 hosts_paths_privileges_under_role(parameters).each do |role, role_host_backup_restore_config|
   role_host_backup_restore_config[:paths].each do |path_config|
     config = amanda_config(role, path_config[:path])
