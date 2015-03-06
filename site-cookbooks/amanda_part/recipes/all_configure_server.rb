@@ -1,4 +1,6 @@
-host_config.each do |role, role_config|
+parameters = CloudConductorUtils::Consul.read_parameters[:cloudconductor]
+roles = ENV['ROLE'].nil? ? [] : ENV['ROLE'].split(',')
+hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
   role_config[:paths].each do |path_config|
     config = amanda_config(role, path_config[:path])
     path_config[:scripts].each do |script_name, script_config|

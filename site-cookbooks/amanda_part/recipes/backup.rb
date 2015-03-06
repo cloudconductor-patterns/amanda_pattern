@@ -1,4 +1,5 @@
-role_host_config.each do |role, role_host_backup_restore_config|
+parameters = CloudConductorUtils::Consul.read_parameters[:cloudconductor]
+hosts_paths_privileges_under_role(parameters).each do |role, role_host_backup_restore_config|
   role_host_backup_restore_config[:paths].each do |path_config| 
     config = amanda_config(role, path_config[:path])
     bash "amdump_#{config[:name]}" do

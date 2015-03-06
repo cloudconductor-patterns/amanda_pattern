@@ -1,7 +1,7 @@
+parameters = CloudConductorUtils::Consul.read_parameters[:cloudconductor]
 roles = ENV['ROLE'].split(',')
-roles.each do |role|
-  next if host_config[role.to_sym].nil?
-  host_config[role.to_sym][:paths].each do |path_config|
+hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
+  role_config[:paths].each do |path_config|
     config = amanda_config(role, path_config[:path])
     ruby_block "amrecover_#{config[:name]}" do
       block do
