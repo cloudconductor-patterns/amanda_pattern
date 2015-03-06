@@ -1,5 +1,5 @@
 {
-  "name": "backup_setup",
+  "name": "backup_restore_setup",
   "description": "Setups amanda",
   "chef_type": "role",
   "json_class":"Chef::Role",

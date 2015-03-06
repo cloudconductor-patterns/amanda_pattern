@@ -1,5 +1,5 @@
 {
-  "name": "backup_backup",
+  "name": "backup_restore_backup",
   "description": "Executes backup",
   "chef_type": "role",
   "json_class":"Chef::Role",
