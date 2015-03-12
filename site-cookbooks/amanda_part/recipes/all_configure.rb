@@ -1,3 +1,6 @@
+Chef::Recipe.send(:include, CloudConductor::CommonHelper)
+Chef::Recipe.send(:include, CloudConductor::AmandaPartHelper)
+
 directory node['amanda_part']['client']['script_dir'] do
   owner node['amanda_part']['user']
   group node['amanda_part']['group']

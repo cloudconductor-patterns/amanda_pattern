@@ -1,3 +1,8 @@
+Chef::Recipe.send(:include, CloudConductor::CommonHelper)
+Chef::Resource.send(:include, CloudConductor::CommonHelper)
+Chef::Recipe.send(:include, CloudConductor::AmandaPartHelper)
+Chef::Resource.send(:include, CloudConductor::AmandaPartHelper)
+
 remote_file "#{Chef::Config[:file_cache_path]}/amanda-backup_client-3.3.6-1.rhel6.x86_64.rpm" do
   source 'http://www.zmanda.com/downloads/community/Amanda/3.3.6/Redhat_Enterprise_6.0/amanda-backup_client-3.3.6-1.rhel6.x86_64.rpm'
   notifies :install, 'yum_package[amanda-backup_client]', :immediately

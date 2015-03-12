@@ -1,11 +1,15 @@
+Chef::Recipe.send(:include, CloudConductor::CommonHelper)
+Chef::Recipe.send(:include, CloudConductor::AmandaPartHelper)
+
 amandahosts = File.join(node['amanda_part']['amanda_data_dir'], '.amandahosts')
+amanda_server_info = amanda_server
 template amandahosts do
   owner node['amanda_part']['user']
   group node['amanda_part']['group']
   source '.amandahosts-server.erb'
   mode 0600
   variables(
-    amanda_server: amanda_server,
+    amanda_server: amanda_server_info,
     amanda_clients: CloudConductorUtils::Consul.read_servers
   )
 end

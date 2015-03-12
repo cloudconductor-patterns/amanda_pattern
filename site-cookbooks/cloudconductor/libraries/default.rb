@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'chef/recipe'
-require 'chef/resource'
-require 'chef/provider'
-
 require 'cloud_conductor_utils/consul'
 
 module CloudConductor
@@ -32,8 +28,10 @@ module CloudConductor
       end
       result
     end
+    def host_private_ip
+      CloudConductorUtils::Consul.read_servers.map do |hostname, server_info|
+        node['hostname'] == hostname ? server_info[:private_ip] : nil
+      end.compact.first
+    end
   end
 end
-
-Chef::Recipe.send(:include, CloudConductor::CommonHelper)
-Chef::Resource.send(:include, CloudConductor::CommonHelper)

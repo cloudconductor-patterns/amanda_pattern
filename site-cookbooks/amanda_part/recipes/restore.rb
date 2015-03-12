@@ -1,3 +1,6 @@
+Chef::Recipe.send(:include, CloudConductor::CommonHelper)
+Chef::Recipe.send(:include, CloudConductor::AmandaPartHelper)
+
 parameters = CloudConductorUtils::Consul.read_parameters[:cloudconductor]
 roles = ENV['ROLE'].split(',')
 hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
