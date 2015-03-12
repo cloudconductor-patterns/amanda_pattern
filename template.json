@@ -114,19 +114,6 @@
         "SubnetId" : { "Ref" : "SubnetId" }
       }
     },
-    "FrontendEIP" : {
-      "Type" : "AWS::EC2::EIP",
-      "Properties" : {
-        "Domain" : "vpc"
-      }
-    },
-    "EIPAssociation" : {
-      "Type" : "AWS::EC2::EIPAssociation",
-      "Properties" : {
-        "AllocationId" : { "Fn::GetAtt" : [ "FrontendEIP", "AllocationId" ]},
-        "NetworkInterfaceId" : { "Ref" : "BackupRestoreNetworkInterface" }
-      }
-    },
     "BackupRestoreSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
@@ -171,9 +158,5 @@
     }
   },
   "Outputs" : {
-    "FrontendAddress" : {
-      "Value" : { "Ref" : "FrontendEIP" },
-      "Description" : "Frontend DNS name or IP address to access Consul api port from CloudConductor server. This output is required."
-    }
   }
 }
