@@ -110,6 +110,7 @@
     "BackupRestoreNetworkInterface" : {
       "Type" : "AWS::EC2::NetworkInterface",
       "Properties" : {
+        "AssociatePublicIpAddress" : true,
         "GroupSet" : [{"Ref" : "SharedSecurityGroup"}, {"Ref" : "BackupRestoreSecurityGroup"}],
         "SubnetId" : { "Ref" : "SubnetId" }
       }
