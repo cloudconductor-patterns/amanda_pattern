@@ -72,6 +72,7 @@
         "InstanceType" : { "Ref" : "BackupRestoreInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
+           "AssociatePublicIpAddress" : true,
            "DeviceIndex" : "0",
            "NetworkInterfaceId" : { "Ref" : "BackupRestoreNetworkInterface" }
         }],
@@ -110,7 +111,6 @@
     "BackupRestoreNetworkInterface" : {
       "Type" : "AWS::EC2::NetworkInterface",
       "Properties" : {
-        "AssociatePublicIpAddress" : true,
         "GroupSet" : [{"Ref" : "SharedSecurityGroup"}, {"Ref" : "BackupRestoreSecurityGroup"}],
         "SubnetId" : { "Ref" : "SubnetId" }
       }
