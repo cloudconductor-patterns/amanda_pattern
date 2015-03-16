@@ -23,7 +23,7 @@ module CloudConductor
       roles_config.inject({}) do |result, (role, role_config)|
         next result unless roles.include?(role.to_s)
         ::Chef::Mixin::DeepMerge.deep_merge!(
-          {role => role_config},
+          { role => role_config },
           result
         )
       end
@@ -36,12 +36,7 @@ module CloudConductor
         next result if pattern[:config].nil? || pattern[:config][:backup_restore].nil?
         ::Chef::Mixin::DeepMerge.deep_merge!(pattern[:config][:backup_restore], result)
       end
-      applications = parameters[:applications] || {}
-      deploy_role_config = applications.inject({}) do |result, (application_name, application)|
-        next result if application[:parameters].nil? || application[:parameters][:backup_restore].nil?
-        ::Chef::Mixin::DeepMerge.deep_merge!(application[:parameters][:backup_restore], result)
-      end
-      ::Chef::Mixin::DeepMerge.deep_merge!(deploy_role_config, role_config)
+      ::Chef::Mixin::DeepMerge.deep_merge!(application_hosts_paths_privileges_under_role, role_config)
       role_config.inject({}) do |result, (role, role_parameter)|
         ::Chef::Mixin::DeepMerge.deep_merge!(
           {
@@ -53,6 +48,14 @@ module CloudConductor
           },
           result
         )
+      end
+    end
+
+    def application_hosts_paths_privileges_under_role(parameters)
+      applications = parameters[:applications] || {}
+      applications.inject({}) do |result, (_application_name, application)|
+        next result if application[:parameters].nil? || application[:parameters][:backup_restore].nil?
+        ::Chef::Mixin::DeepMerge.deep_merge!(application[:parameters][:backup_restore], result)
       end
     end
 

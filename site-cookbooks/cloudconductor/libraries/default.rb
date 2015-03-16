@@ -28,6 +28,7 @@ module CloudConductor
       end
       result
     end
+
     def host_private_ip
       CloudConductorUtils::Consul.read_servers.map do |hostname, server_info|
         node['hostname'] == hostname ? server_info[:private_ip] : nil
