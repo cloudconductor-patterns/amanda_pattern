@@ -17,7 +17,7 @@ describe 'connect amanda_server' do
     interface = hostname == svr_name.to_s ? '-I lo' : ''
     describe "#{svr_name} access check" do
       describe command("hping3 -S #{server[:private_ip]} -p 10080 -c 5 #{interface}") do
-        its(:stdout) { should match /sport=10080 flags=SA/ }
+        its(:stdout) { should match(/sport=10080 flags=SA/) }
       end
     end
   end

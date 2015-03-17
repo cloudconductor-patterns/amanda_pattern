@@ -29,6 +29,7 @@ module CloudConductor
       end
     end
 
+    # rubocop: disable MethodLength
     def hosts_paths_privileges_under_role(parameters)
       return {} if parameters.nil?
       patterns = parameters[:patterns] || {}
@@ -36,7 +37,10 @@ module CloudConductor
         next result if pattern[:config].nil? || pattern[:config][:backup_restore].nil?
         ::Chef::Mixin::DeepMerge.deep_merge!(pattern[:config][:backup_restore], result)
       end
-      ::Chef::Mixin::DeepMerge.deep_merge!(application_hosts_paths_privileges_under_role, role_config)
+      ::Chef::Mixin::DeepMerge.deep_merge!(
+        application_hosts_paths_privileges_under_role(parameters),
+        role_config
+      )
       role_config.inject({}) do |result, (role, role_parameter)|
         ::Chef::Mixin::DeepMerge.deep_merge!(
           {
@@ -50,6 +54,7 @@ module CloudConductor
         )
       end
     end
+    # rubocop: enable MethodLength
 
     def application_hosts_paths_privileges_under_role(parameters)
       applications = parameters[:applications] || {}
