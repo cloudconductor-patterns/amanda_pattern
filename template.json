@@ -72,9 +72,10 @@
         "InstanceType" : { "Ref" : "BackupRestoreInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
-           "AssociatePublicIpAddress" : true,
-           "DeviceIndex" : "0",
-           "NetworkInterfaceId" : { "Ref" : "BackupRestoreNetworkInterface" }
+          "AssociatePublicIpAddress" : true,
+          "DeviceIndex" : "0",
+          "GroupSet" : [{"Ref" : "SharedSecurityGroup"}, {"Ref" : "BackupRestoreSecurityGroup"}],
+          "SubnetId" : { "Ref" : "SubnetId" }
         }],
         "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/sh -v\n",
@@ -102,17 +103,9 @@
           "  fi\n",
           "  sleep 1\n",
           "done\n",
-          "/opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "BackupRestoreWaitHandle" }, "'\n",
-          "exit 1\n"
+          "error_exit 'Failed to join the consul cluster.'\n"
         ]]}},
         "Tags" : [{"Key": "Name", "Value": "BackupRestoreServer"}, {"Key": "Role", "Value": "backup_restore"}]
-      }
-    },
-    "BackupRestoreNetworkInterface" : {
-      "Type" : "AWS::EC2::NetworkInterface",
-      "Properties" : {
-        "GroupSet" : [{"Ref" : "SharedSecurityGroup"}, {"Ref" : "BackupRestoreSecurityGroup"}],
-        "SubnetId" : { "Ref" : "SubnetId" }
       }
     },
     "BackupRestoreSecurityGroup" : {
