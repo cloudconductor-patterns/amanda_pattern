@@ -10,10 +10,9 @@ directory node['amanda_part']['client']['script_dir'] do
   not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
-case amanda_server?
-when true
+if amanda_server?
   include_recipe 'amanda_part::all_configure_server'
-when false
+else
   include_recipe 'amanda_part::all_configure_client'
 end
 
