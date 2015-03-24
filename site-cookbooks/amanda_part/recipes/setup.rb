@@ -13,11 +13,24 @@ service 'xinetd' do
   action :nothing
 end
 
-cookbook_file '/etc/xinetd.d/amandaserver' do
+proxies = {
+  'http_proxy' => ENV['http_proxy'],
+  'https_proxy' => ENV['https_proxy'],
+  'no_proxy' => ENV['no_proxy']
+}
+env_parameter = proxies.each_with_object([]) do |(key, value), result|
+  result << "#{key}=#{value}" if not value.nil?
+end
+env_parameter.unshift('env             =') if not env_parameter.empty?
+
+template '/etc/xinetd.d/amandaserver' do
   owner node['amanda_part']['user']
   group node['amanda_part']['group']
-  source 'amandaserver'
+  source 'amandaserver.erb'
   mode 0644
+  variables(
+    env_parameter: env_parameter.join(' ')
+  )
   notifies :restart, 'service[xinetd]', :immediate
 end
 

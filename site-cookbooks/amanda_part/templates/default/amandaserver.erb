@@ -15,4 +15,5 @@ service amanda
         groups          = yes
         server          = /usr/libexec/amanda/amandad
         server_args     = -auth=bsdtcp amdump amindexd amidxtaped
+        <%= @env_parameter %>
 }
