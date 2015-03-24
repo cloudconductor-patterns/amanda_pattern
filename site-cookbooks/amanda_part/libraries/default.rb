@@ -161,7 +161,7 @@ module CloudConductor
       private_ip = server[:private_ip].split('.').map(&:to_i).pack('C4')
       begin
         server[:alias] = Socket.gethostbyaddr(private_ip)[0]
-      rescue SocketError => e
+      rescue SocketError
         server[:alias] = nil
       end
       server
@@ -173,7 +173,7 @@ module CloudConductor
         private_ip = client[:private_ip].split('.').map(&:to_i).pack('C4')
         begin
           client[:alias] = Socket.gethostbyaddr(private_ip)[0]
-        rescue SocketError => e
+        rescue SocketError
           client[:alias] = nil
         end
         result[hostname] = client
