@@ -1,3 +1,4 @@
 <%= @amanda_server[:hostname] %> <%= node['amanda_part']['user'] %> amdump
+<%= @amanda_server[:alias] %> <%= node['amanda_part']['user'] %> amdump
 <%= @amanda_server[:private_ip] %> <%= node['amanda_part']['user'] %> amdump
 localhost root amindexd amidxtaped
