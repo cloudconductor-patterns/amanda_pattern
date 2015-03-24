@@ -164,7 +164,7 @@ module CloudConductor
     end
 
     def amanda_clients
-      CloudConductorUtils::Consul.read_servers.each_with_object({}) do |result, (hostname, client)|
+      CloudConductorUtils::Consul.read_servers.each_with_object({}) do |(hostname, client), result|
         client[:hostname] = hostname
         private_ip = client[:private_ip].split('.').map(&:to_i).pack('C4')
         client[:alias] = Socket.gethostbyaddr(private_ip)[0]
