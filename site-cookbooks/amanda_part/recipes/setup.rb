@@ -19,9 +19,9 @@ proxies = {
   'no_proxy' => ENV['no_proxy']
 }
 env_parameter = proxies.each_with_object([]) do |(key, value), result|
-  result << "#{key}=#{value}" if not value.nil?
+  result << "#{key}=#{value}" unless value.nil?
 end
-env_parameter.unshift('env             =') if not env_parameter.empty?
+env_parameter.unshift('env             =') unless env_parameter.empty?
 
 template '/etc/xinetd.d/amandaserver' do
   owner node['amanda_part']['user']

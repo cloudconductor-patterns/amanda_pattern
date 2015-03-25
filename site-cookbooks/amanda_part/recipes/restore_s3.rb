@@ -23,7 +23,6 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
           access_key_id: node['amanda_part']['server']['s3']['tpchanger']['s3_access_key'],
           secret_access_key: node['amanda_part']['server']['s3']['tpchanger']['s3_secret_key']
         )
-        buckets = s3.list_buckets
         objects = s3.list_objects(bucket: bucket_name)
         target_objects = objects.contents.select do |object|
           object.key.start_with?("#{role}/#{config[:disk_postfix]}/")
