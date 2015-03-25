@@ -1,6 +1,10 @@
 Chef::Recipe.send(:include, CloudConductor::CommonHelper)
 Chef::Recipe.send(:include, CloudConductor::AmandaPartHelper)
 
+gem_package 'aws-sdk-core' do
+  action :install
+end
+
 directory node['amanda_part']['client']['script_dir'] do
   owner node['amanda_part']['user']
   group node['amanda_part']['group']
@@ -8,6 +12,13 @@ directory node['amanda_part']['client']['script_dir'] do
   recursive true
   action :create
   not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
+end
+
+directory node['amanda_part']['amanda_restore_work_dir'] do
+  mode 0755
+  recursive true
+  action :create
+  not_if { File.exist?(node['amanda_part']['amanda_restore_work_dir']) }
 end
 
 if amanda_server?
