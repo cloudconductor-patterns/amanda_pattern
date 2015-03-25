@@ -17,7 +17,7 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
   role_config[:paths].each do |path_config|
     config = amanda_config(role, path_config[:path])
     restore_file = File.join(node['amanda_part']['amanda_restore_work_dir'], 'restore.tar')
-    next unless (path_config[:restore_enabled] && s3.list_objects(bucket: bucket_name).length > 0)
+    next unless path_config[:restore_enabled] && s3.list_objects(bucket: bucket_name).length > 0
     execute 'execute pre_restore script' do
       command "su - #{node['amanda_part']['user']} -l -c /usr/libexec/amanda/application/pre_restore_#{config[:name]}"
       action :run
