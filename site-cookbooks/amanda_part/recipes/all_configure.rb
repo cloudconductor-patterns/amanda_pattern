@@ -14,13 +14,6 @@ directory node['amanda_part']['client']['script_dir'] do
   not_if { File.exist?(node['amanda_part']['client']['script_dir']) }
 end
 
-directory node['amanda_part']['amanda_restore_work_dir'] do
-  mode 0755
-  recursive true
-  action :create
-  not_if { File.exist?(node['amanda_part']['amanda_restore_work_dir']) }
-end
-
 if amanda_server?
   include_recipe 'amanda_part::all_configure_server'
 else
