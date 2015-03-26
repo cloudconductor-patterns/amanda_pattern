@@ -83,8 +83,15 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
       command "cat #{node['amanda_part']['amanda_restore_work_dir']}/*.data > #{restore_file}"
       action :run
     end
+    ruby_block 'cleanup target directory' do
+      block do
+        require "fileutils"
+        FileUtils.rm_rf "#{path_config[:path]}/*"
+      end
+    end
     execute 'execute restore' do
-      command "dd if=#{restore_file} bs=32k count=1 | tar -xpGC #{path_config[:path]}"
+      command "tar xvf #{restore_file}"
+      cwd path_config[:path]
       action :run
     end
     execute 'execute post_restore script' do
