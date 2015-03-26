@@ -85,7 +85,7 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
     end
     ruby_block 'cleanup target directory' do
       block do
-        require "fileutils"
+        require 'fileutils'
         FileUtils.rm_rf "#{path_config[:path]}/*"
       end
     end
