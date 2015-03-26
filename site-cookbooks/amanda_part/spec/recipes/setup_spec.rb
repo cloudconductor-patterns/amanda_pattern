@@ -10,7 +10,7 @@ describe 'amanda_part::setup' do
   end
 
   it 'install amandaserver service file' do
-    expect(chef_run).to create_cookbook_file('/etc/xinetd.d/amandaserver')
+    expect(chef_run).to create_template('/etc/xinetd.d/amandaserver')
   end
 
   it 'install watches for backup_restore'  do
