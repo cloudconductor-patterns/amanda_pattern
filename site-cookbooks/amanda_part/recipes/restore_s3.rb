@@ -37,8 +37,28 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
     ruby_block 'download restore file' do
       block do
         path_pattern = "#{role}/#{config[:disk_postfix]}/"
+        filestart_pattern = "#{path_pattern}.*-filestart"
         data_pattern = "#{path_pattern}.*\.data"
         objects = s3.list_objects(bucket: bucket_name)
+        target_filestarts = objects.contents.select do |object|
+          object.key.match(/#{filestart_pattern}/)
+        end
+        exists_filestarts = target_filestarts.each_with_object([]) do |object, result|
+          s3.get_object(bucket: bucket_name, key: object.key) do |chunk|
+            result << object if chunk.match(/^ORIGSIZE=10$/m).nil?
+          end
+        end
+        if exists_filestarts.empty?
+          latest_filestart = target_filestarts.sort! do |left, right|
+            left.last_modified <=> right.last_modified
+          end.last
+        else
+          latest_filestart = exists_filestarts.sort! do |left, right|
+            left.last_modified <=> right.last_modified
+          end.last
+        end
+        filestart_elements = latest_filestart.key.match(/(#{path_pattern})(.*)-(.*)-filestart/)
+        data_pattern = "#{path_pattern}#{filestart_elements[2]}-#{filestart_elements[3]}-.*\.data"
         target_objects = objects.contents.select do |object|
           object.key.match(/#{data_pattern}/)
         end
