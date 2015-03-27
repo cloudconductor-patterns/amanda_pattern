@@ -31,18 +31,6 @@ Attributes
 The attributes not described here have default values, and you can change the value of them if you need.
 Please see the attribute files if you want to know what kind of attributes are in this pattern.
 
-Mandatory parameters
---------------------
-
-Nothing.
-
-Example of parameters
----------------------
-
-    {
-      "amanda": {
-      }
-    }
 
 Copyright and License
 =====================
@@ -67,6 +55,6 @@ Contact
 
 For more information: <http://cloudconductor.org/>
 
-Report issues and requests: <https://github.com/cloudconductor-patterns/zabbix_pattern/issues>
+Report issues and requests: <https://github.com/cloudconductor-patterns/amanda_pattern/issues>
 
 Send feedback to: <ccndctr@gmail.com>
