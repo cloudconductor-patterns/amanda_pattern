@@ -1,0 +1,13 @@
+<%= @amanda_server[:hostname] %> <%= node['amanda_part']['user'] %> amdump
+<% unless @amanda_server[:alias].nil? %>
+<%= @amanda_server[:alias] %> <%= node['amanda_part']['user'] %> amdump
+<% end %>
+<%= @amanda_server[:private_ip] %> <%= node['amanda_part']['user'] %> amdump
+<% @amanda_clients.each do |hostname, amanda_client| %>
+<%= hostname %> root amindexd amidxtaped
+<% unless amanda_client[:alias].nil? %>
+<%= amanda_client[:alias] %> root amindexd amidxtaped
+<% end %>
+<%= amanda_client[:private_ip] %> root amindexd amidxtaped
+<% end %>
+localhost root amindexd amidxtaped

@@ -1,0 +1,10 @@
+DEPENDENCIES
+  amanda_part
+    path: site-cookbooks/amanda_part
+  cloudconductor
+    path: site-cookbooks/cloudconductor
+
+GRAPH
+  amanda_part (0.0.1)
+    cloudconductor (>= 0.0.0)
+  cloudconductor (0.0.1)

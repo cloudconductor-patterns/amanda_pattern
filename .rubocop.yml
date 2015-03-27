@@ -1,0 +1,27 @@
+AllCops:
+  Exclude:
+    - cookbooks/**/*
+    - vendor/**/*
+
+LineLength:
+  Max: 130
+  Exclude:
+    - site-cookbooks/zabbix_part/resources/auto_registration.rb
+
+MethodLength:
+  Max: 20
+
+AbcSize:
+  Enabled: false
+
+AsciiComments:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/SingleSpaceBeforeFirstArg:
+  Enabled: false

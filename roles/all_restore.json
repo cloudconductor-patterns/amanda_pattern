@@ -1,0 +1,9 @@
+{
+  "name": "all_restore",
+  "description": "Executes restore",
+  "chef_type": "role",
+  "json_class":"Chef::Role",
+  "run_list": [
+    "recipe[amanda_part::restore]"
+  ]
+}

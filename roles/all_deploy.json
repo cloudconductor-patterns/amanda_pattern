@@ -1,0 +1,9 @@
+{
+  "name": "all_deploy",
+  "description": "Reconfigures amanda client at deploy",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "recipe[amanda_part::all_configure]"
+  ]
+}
