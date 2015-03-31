@@ -1,0 +1,149 @@
+require_relative '../spec_helper'
+
+describe 'amanda_part::all_configure_client' do
+  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+
+  it 'download amanda-backup_client package' do
+    expect(chef_run).to create_remote_file(/.*amanda-backup_client-3\.3\.6-1\.rhel6\.x86_64\.rpm/).with(
+      source: 'http://www.zmanda.com/downloads/community/Amanda/3.3.6/Redhat_Enterprise_6.0/amanda-backup_client-3.3.6-1.rhel6.x86_64.rpm'
+    )
+    file = chef_run.remote_file(/.*amanda-backup_client-3\.3\.6-1\.rhel6\.x86_64\.rpm/)
+    expect(file).to notify('yum_package[amanda-backup_client]').to(:install)
+  end
+
+  it 'install amandaclient service file' do
+    expect(chef_run).to create_cookbook_file('/etc/xinetd.d/amandaclient')
+    file = chef_run.cookbook_file('/etc/xinetd.d/amandaclient')
+    expect(file.mode).to eq(0644)
+    expect(file).to notify('service[xinetd]').to(:restart)
+  end
+
+  it 'create amanda data directory' do
+    allow(File).to receive(:exist?).and_call_original
+    allow(File).to receive(:exist?).with('/var/lib/amanda').and_return(false)
+    expect(chef_run).to create_directory('/var/lib/amanda')
+  end
+
+  it 'create .amandahosts' do
+    expect(chef_run).to create_template('/var/lib/amanda/.amandahosts')
+    file = chef_run.template('/var/lib/amanda/.amandahosts')
+    expect(file.mode).to eq(0600)
+  end
+
+  describe 'roles configuration part' do
+    test_parameter = {
+      :web => {
+        :hosts => {
+          'testhost'=>
+          {
+            :roles=>['web'],
+            :pattern=>'test_pattern',
+            :private_ip=>'172.17.0.67'
+          }
+        },
+        :paths => [
+          {
+            :path => '/test',
+            :schedule => '0 0 * * *',
+            :restore_enabled => true,
+            :prepare_path => true,
+            :scripts => {
+              'pre_backup_web_test' => {
+                :timing => 'pre-dle-backup',
+                :script => 'exit 0'
+              },
+              'post_restore_web_test' => {
+                :timing => 'pre-dle-backup',
+                :script => 'exit 0'
+              }
+            },
+            :dumptype => 'dumptype_web_test'
+          }
+        ],
+        :privileges => [
+          {
+            :user => "root",
+            :command => "ls"
+          }
+        ]
+      }
+    }
+    test_config = {
+      :name => 'web_test',
+      :role => :db,
+      :disk_postfix => '_test',
+      :config_dir => '/etc/amanda/web_test',
+      :vtapes_dir => '/var/lib/amanda/vtapes/web_test',
+      :holding_dir => '/var/lib/amanda/holding/web_test',
+      :state_dir => '/var/lib/amanda/state/web_test',
+      :info_dir => '/var/lib/amanda/state/curinfo/web_test',
+      :log_dir => '/var/lib/amanda/log/web_test',
+      :index_dir => '/var/lib/amanda/index/web_test',
+      :slot => 8,
+      :tapetype => 'S3',
+      :tpchanger => 's3_tpchanger',
+      :definition => nil,
+      :autolabel => 'S3-%%%%',
+      :labelstr => '^S3-[0-9][0-9]*$',
+      :dumpcycle => '1 weeks',
+      :runspercycle => '7 days',
+      :tapecycle => '8 tapes',
+      :dumptype => 'dumptype_tar',
+      :holding_name => 'hd_web_test',
+      :holding_use => '100 mbytes',
+      :holding_chunksize => '1 mbyte',
+      :slot_dirs => [
+        '/var/lib/amanda/vtapes/web_test/1',
+        '/var/lib/amanda/vtapes/web_test/2',
+        '/var/lib/amanda/vtapes/web_test/3',
+        '/var/lib/amanda/vtapes/web_test/4',
+        '/var/lib/amanda/vtapes/web_test/5',
+        '/var/lib/amanda/vtapes/web_test/6',
+        '/var/lib/amanda/vtapes/web_test/7',
+        '/var/lib/amanda/vtapes/web_test/8'
+      ],
+      :storage => 's3'
+    }
+
+    before do
+      allow_any_instance_of(Chef::Recipe).to receive(:hosts_paths_privileges_by_role).and_return(test_parameter)
+      allow_any_instance_of(Chef::Recipe).to receive(:amanda_config).and_return(test_config)
+    end
+   
+    it 'create config directory' do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('/etc/amanda/web_test').and_return(false)
+      expect(chef_run).to create_directory('/etc/amanda/web_test')
+    end
+
+    it 'create amanda-client.conf' do
+      expect(chef_run).to create_template('/etc/amanda/web_test/amanda-client.conf')
+      file = chef_run.template('/etc/amanda/web_test/amanda-client.conf')
+      expect(file.mode).to eq(0644)
+    end
+
+    it 'create pre backup script' do
+      expect(chef_run).to create_template('/usr/libexec/amanda/application/pre_backup_web_test')
+      file = chef_run.template('/usr/libexec/amanda/application/pre_backup_web_test')
+      expect(file.mode).to eq(0755)
+    end
+
+    it 'create post restore script' do
+      expect(chef_run).to create_template('/usr/libexec/amanda/application/post_restore_web_test')
+      file = chef_run.template('/usr/libexec/amanda/application/post_restore_web_test')
+      expect(file.mode).to eq(0755)
+    end
+
+    it 'create backup target directory directory' do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('/test').and_return(false)
+      expect(chef_run).to create_directory('/test')
+    end
+
+    it 'create sudoers configuration file' do
+      expect(chef_run).to create_template('/etc/sudoers.d/backup_restore_web')
+      file = chef_run.template('/etc/sudoers.d/backup_restore_web')
+      expect(file.mode).to eq(0600)
+    end
+  end
+end
