@@ -38,7 +38,7 @@ describe 'amanda_part::all_configure_client' do
           {
             :roles=>['web'],
             :pattern=>'test_pattern',
-            :private_ip=>'172.17.0.67'
+            :private_ip=>'127.0.0.1'
           }
         },
         :paths => [
