@@ -1,6 +1,6 @@
 require_relative '../spec_helper'
 
-describe 'amanda_part::all_configure_server' do
+describe 'amanda_part::backup' do
   let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
 
   test_parameter = {
@@ -78,25 +78,12 @@ describe 'amanda_part::all_configure_server' do
   }
 
   before do
-    allow_any_instance_of(Chef::Recipe).to receive(:hosts_paths_privileges_by_role).and_return(test_parameter)
+    allow_any_instance_of(Chef::Recipe).to receive(:hosts_paths_privileges_under_role).and_return(test_parameter)
     allow_any_instance_of(Chef::Recipe).to receive(:amanda_config).and_return(test_config)
   end
-   
-  it 'create pre backup script' do
-    expect(chef_run).to create_template('/usr/libexec/amanda/application/pre_backup_web_test')
-    file = chef_run.template('/usr/libexec/amanda/application/pre_backup_web_test')
-    expect(file.mode).to eq(0755)
-  end
 
-  it 'create post restore script' do
-    expect(chef_run).to create_template('/usr/libexec/amanda/application/post_restore_web_test')
-    file = chef_run.template('/usr/libexec/amanda/application/post_restore_web_test')
-    expect(file.mode).to eq(0755)
-  end
-
-  it 'create sudoers configuration file' do
-    expect(chef_run).to create_template('/etc/sudoers.d/backup_restore_web')
-    file = chef_run.template('/etc/sudoers.d/backup_restore_web')
-    expect(file.mode).to eq(0600)
+  it 'execute backup command' do
+    allow_any_instance_of(Chef::Resource).to receive(:amanda_server?).and_return(true)
+    expect(chef_run).to run_bash('amdump_web_test')
   end
 end
