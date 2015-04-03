@@ -17,7 +17,7 @@ end
 parameters = CloudConductorUtils::Consul.read_parameters[:cloudconductor]
 roles = ENV['ROLE'].split(',')
 
-unless target_bucket.nil?
+unless target_bucket.size == 0
   hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
     role_config[:paths].each do |path_config|
       config = amanda_config(role, path_config[:path])

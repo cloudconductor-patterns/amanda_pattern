@@ -83,7 +83,7 @@ describe 'amanda_part::restore_s3' do
     s3_list_buckets_buckets = [
       double(
         'bucket1',
-        name: 'testbucket'
+        name: ''
       )
     ]
     s3_list_objects_contents = [
