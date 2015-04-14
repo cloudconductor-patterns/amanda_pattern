@@ -79,7 +79,21 @@ describe 'amanda_part::restore' do
 
   before do
     ENV['ROLE'] = 'web'
-    require 'aws-sdk-core'
+    module Aws
+      module S3
+        class Client
+        end
+      end
+    end
+    allow_any_instance_of(Kernel).to receive(:require).and_call_original
+    allow_any_instance_of(Kernel).to receive(:require).with('aws-sdk-core').and_return(true)
+
+    s3_list_buckets_buckets = [
+      double(
+        'bucket1',
+        name: ''
+      )
+    ]
     s3_list_objects_contents = [
       double(
         'object1',
@@ -88,7 +102,8 @@ describe 'amanda_part::restore' do
       )
     ]
     s3_list_objects = double('s3_list_objects', contents: s3_list_objects_contents)
-    s3 = double('s3', list_objects: s3_list_objects)
+    s3_list_buckets = double('s3_list_buckets', buckets: s3_list_buckets_buckets)
+    s3 = double('s3', list_objects: s3_list_objects, list_buckets: s3_list_buckets)
     allow(Aws::S3::Client).to receive(:new).and_call_original
     allow(Aws::S3::Client).to receive(:new).and_return(s3)
     allow_any_instance_of(Chef::Recipe).to receive(:hosts_paths_privileges_by_role).and_return(test_parameter)
