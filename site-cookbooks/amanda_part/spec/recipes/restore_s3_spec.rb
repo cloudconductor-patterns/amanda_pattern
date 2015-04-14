@@ -79,7 +79,15 @@ describe 'amanda_part::restore_s3' do
 
   before do
     ENV['ROLE'] = 'web'
-    require 'aws-sdk-core'
+    module Aws
+      module S3
+        class Client
+        end
+      end
+    end
+    allow_any_instance_of(Kernel).to receive(:require).and_call_original
+    allow_any_instance_of(Kernel).to receive(:require).with('aws-sdk-core').and_return(true)
+
     s3_list_buckets_buckets = [
       double(
         'bucket1',
