@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-## versoin 1.0.1 (2015/04/15)
+## versoin 1.0.1 (2015/04/16)
 
   - Fix restore process to skip restoring to avoid no_such_bucket_error in case that the target bucket does not exist.
 
