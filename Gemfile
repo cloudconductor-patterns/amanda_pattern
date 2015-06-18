@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'rake'
-gem 'cloud_conductor_utils', git: 'https://github.com/cloudconductor/cloud_conductor_utils.git'
 gem 'activesupport'
 gem 'aws-sdk-core'
 
