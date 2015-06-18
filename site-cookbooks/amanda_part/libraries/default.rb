@@ -14,7 +14,6 @@
 # limitations under the License.
 
 require 'socket'
-require 'cloud_conductor_utils/consul'
 
 module CloudConductor
   module AmandaPartHelper
@@ -66,7 +65,9 @@ module CloudConductor
     end
 
     def hosts_under_role(role)
-      servers = CloudConductorUtils::Consul.read_servers
+      if node['cloudconductor'] && node['cloudconductor']['servers']
+        servers = node['cloudconductor']['servers'].to_hash
+      end
       return [] if servers.nil?
       servers.select do |_hostname, server_info|
         server_info[:roles].include?(role.to_s)
@@ -168,7 +169,12 @@ module CloudConductor
     end
 
     def amanda_clients
-      CloudConductorUtils::Consul.read_servers.each_with_object({}) do |(hostname, client), result|
+      if node['cloudconductor'] && node['cloudconductor']['servers']
+        servers = node['cloudconductor']['servers'].to_hash
+      else
+        servers = {}
+      end
+      servers.each_with_object({}) do |(hostname, client), result|
         client[:hostname] = hostname
         private_ip = client[:private_ip].split('.').map(&:to_i).pack('C4')
         begin
