@@ -70,7 +70,7 @@ module CloudConductor
       end
       return [] if servers.nil?
       servers.select do |_hostname, server_info|
-        server_info[:roles].include?(role.to_s)
+        server_info['roles'].include?(role.to_s)
       end
     end
 
