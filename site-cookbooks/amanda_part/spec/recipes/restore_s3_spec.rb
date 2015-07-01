@@ -97,7 +97,7 @@ describe 'amanda_part::restore_s3' do
     s3_list_objects_contents = [
       double(
         'object1',
-        key: 'web/slot-0000-filestart',
+        key: 'web/_test/slot-0000-filestart',
         last_modified: '2015/01/01'
       )
     ]
