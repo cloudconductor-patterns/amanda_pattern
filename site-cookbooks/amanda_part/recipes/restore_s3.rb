@@ -4,6 +4,7 @@ Chef::Recipe.send(:include, CloudConductor::AmandaPartHelper)
 require 'aws-sdk-core'
 
 bucket_name = node['amanda_part']['server']['s3']['tpchanger']['bucket_name']
+prefix = node['amanda_part']['server']['s3']['tpchanger']['prefix']
 s3 = Aws::S3::Client.new(
   region: node['amanda_part']['server']['s3']['tpchanger']['s3_bucket_location'],
   access_key_id: node['amanda_part']['server']['s3']['tpchanger']['s3_access_key'],
@@ -22,7 +23,7 @@ unless target_bucket.size == 0
     role_config[:paths].each do |path_config|
       config = amanda_config(role, path_config[:path])
       restore_file = File.join(node['amanda_part']['amanda_restore_work_dir'], 'restore.tar')
-      next unless path_config[:restore_enabled] && s3.list_objects(bucket: bucket_name).contents.size > 0
+      next unless path_config[:restore_enabled] && s3.list_objects(bucket: bucket_name, prefix: prefix).contents.size > 0
       directory node['amanda_part']['amanda_restore_work_dir'] do
         recursive true
         action :delete
@@ -44,7 +45,7 @@ unless target_bucket.size == 0
           path_pattern = "#{role}/#{config[:disk_postfix]}/"
           filestart_pattern = "#{path_pattern}.*-filestart"
           data_pattern = "#{path_pattern}.*\.data"
-          objects = s3.list_objects(bucket: bucket_name)
+          objects = s3.list_objects(bucket: bucket_name, prefix: prefix)
           target_filestarts = objects.contents.select do |object|
             object.key.match(/#{filestart_pattern}/)
           end
