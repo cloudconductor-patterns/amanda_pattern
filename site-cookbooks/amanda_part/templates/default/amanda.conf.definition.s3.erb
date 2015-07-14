@@ -1,10 +1,11 @@
-define tapetype <%= @node['amanda_part']['server']['s3']['tapetype']['name'] %> {
-    length <%= @node['amanda_part']['server']['s3']['tapetype']['length'] %>
-}
-
 <%
+    tapetype = @node['amanda_part']['server']['s3']['tapetype']
     tpchanger = @node['amanda_part']['server']['s3']['tpchanger']
 %>
+
+define tapetype <%= tapetype['name'] %> {
+    length <%= tapetype['length'] %>
+}
 
 define changer <%= tpchanger['name'] %> {
   tpchanger "chg-multi:s3:<%= tpchanger['bucket_name'] %>/<%= tpchanger['prefix'] %>/<%= @config[:role] %>/<%= @config[:disk_postfix] %>/slot-{<%= tpchanger['slots'] %>}"
