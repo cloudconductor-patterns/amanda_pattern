@@ -4,44 +4,70 @@ default:
   timeout: 1800
   chef_config: solo.rb
 
+events:
+  setup:
+    description: Execute setup
+    task: setup
+
+  configure:
+    description: Execute configure chef
+    task: configure
+
+  deploy:
+    description: Execute deploy
+    task: deploy
+
+  backup:
+    description: Execute backup
+    priority: 80
+    task: backup
+
+  restore:
+    description: Execute restore
+    priority: 20
+    task: restore
+
+  spec:
+    description: Execute spec
+    task: spec
+
 tasks:
-  - name: setup
-    trigger: setup
+  setup:
     description: Execute setup chef
     operations:
       - chef:
           run_list:
             - role[{{role}}_setup]
-  - name: configure
-    trigger: configure
+
+  configure:
     description: Execute configure chef
     operations:
       - chef:
           run_list:
             - role[{{role}}_configure]
-  - name: deploy
-    trigger: deploy
+
+  deploy:
     description: Execute deploy chef
     operations:
       - chef:
           run_list:
             - role[{{role}}_deploy]
-  - name: backup
-    trigger: backup
+
+  backup:
     description: Execute backup chef
     operations:
       - chef:
           run_list:
             - role[{{role}}_backup]
-  - name: restore
-    trigger: restore
+
+  restore:
     description: Execute restore chef
     operations:
       - chef:
           run_list:
             - role[{{role}}_restore]
-  - name: spec
-    trigger: spec
+
+  spec:
     description: Execute spec chef
     operations:
       - chef:
