@@ -159,7 +159,7 @@ module CloudConductor
 
     def amanda_server
       server = server_info('backup_restore').first
-      private_ip = server[:private_ip].split('.').map(&:to_i).pack('C4')
+      private_ip = server['private_ip'].split('.').map(&:to_i).pack('C4')
       begin
         server[:alias] = Socket.gethostbyaddr(private_ip)[0]
       rescue SocketError
@@ -176,7 +176,7 @@ module CloudConductor
       end
       servers.each_with_object({}) do |(hostname, client), result|
         client[:hostname] = hostname
-        private_ip = client[:private_ip].split('.').map(&:to_i).pack('C4')
+        private_ip = client['private_ip'].split('.').map(&:to_i).pack('C4')
         begin
           client[:alias] = Socket.gethostbyaddr(private_ip)[0]
         rescue SocketError
