@@ -24,7 +24,7 @@ module CloudConductor
           s['roles'].include?(role)
         end
         result = servers.map do |hostname, server_info|
-          server_info[:hostname] = hostname
+          server_info['hostname'] = hostname
           server_info.with_indifferent_access
         end
       else
