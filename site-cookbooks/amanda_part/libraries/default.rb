@@ -109,10 +109,10 @@ module CloudConductor
 
     def script_timing
       {
-        pre_backup: 'pre-dle-backup',
-        post_backup: 'post-dle-backup',
-        pre_restore: 'pre-recover',
-        post_restore: 'post-recover'
+        'pre_backup' => 'pre-dle-backup',
+        'post_backup' => 'post-dle-backup',
+        'pre_restore' => 'pre-recover',
+        'post_restore' => 'post-recover'
       }
     end
 
