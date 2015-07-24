@@ -101,7 +101,7 @@ module CloudConductor
       path_parameter[:script].inject({}) do |script_config, (script_name, script)|
         script_config.merge(
           "#{script_name}_#{config_name}" => {
-            timing: script_timing[script_name],
+            timing: script_timing[script_name.to_sym],
             script: script
           }
         )
