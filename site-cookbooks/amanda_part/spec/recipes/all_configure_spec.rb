@@ -33,8 +33,4 @@ describe 'amanda_part::all_configure' do
     allow_any_instance_of(Chef::Recipe).to receive(:amanda_server?).and_return(false)
     expect(chef_run).to include_recipe 'amanda_part::all_configure_client'
   end
-
-  it 'issue backup_ready event' do
-    expect(chef_run).to run_ruby_block('backup_restore_backup_ready_event')
-  end
 end

@@ -10,6 +10,7 @@ events:
     task: setup
 
   configure:
+    priority: 99
     description: Execute configure chef
     task: configure
 
