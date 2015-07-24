@@ -66,7 +66,7 @@ module CloudConductor
 
     def hosts_under_role(role)
       if node['cloudconductor'] && node['cloudconductor']['servers']
-        servers = node['cloudconductor']['servers'].to_hash
+        servers = node['cloudconductor']['servers']
       end
       return [] if servers.nil?
       servers.select do |_hostname, server_info|
