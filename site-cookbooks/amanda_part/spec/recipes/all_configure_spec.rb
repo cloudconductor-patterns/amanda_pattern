@@ -33,4 +33,8 @@ describe 'amanda_part::all_configure' do
     allow_any_instance_of(Chef::Recipe).to receive(:amanda_server?).and_return(false)
     expect(chef_run).to include_recipe 'amanda_part::all_configure_client'
   end
+
+  it 'include all_configure_common' do
+    expect(chef_run).to include_recipe 'amanda_part::all_configure_common'
+  end
 end
