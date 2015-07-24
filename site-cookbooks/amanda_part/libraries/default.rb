@@ -170,7 +170,7 @@ module CloudConductor
 
     def amanda_clients
       if node['cloudconductor'] && node['cloudconductor']['servers']
-        servers = node['cloudconductor']['servers'].to_hash
+        servers = node['cloudconductor']['servers']
       else
         servers = {}
       end
