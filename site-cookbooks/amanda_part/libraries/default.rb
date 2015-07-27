@@ -16,6 +16,7 @@
 require 'socket'
 
 module CloudConductor
+  # rubocop: disable ModuleLength
   module AmandaPartHelper
     def hosts_paths_privileges_by_role(roles, parameters)
       return {} if roles.nil? || parameters.nil?
@@ -192,4 +193,5 @@ module CloudConductor
       amanda_server[:hostname] == node['hostname']
     end
   end
+  # rubocop: enable ModuleLength
 end
