@@ -15,7 +15,7 @@ target_bucket = s3.list_buckets.buckets.select do |bucket|
   bucket.name == bucket_name
 end
 
-parameters = node[:cloudconductor]
+parameters = node['cloudconductor']
 roles = ENV['ROLE'].split(',')
 
 unless target_bucket.size == 0

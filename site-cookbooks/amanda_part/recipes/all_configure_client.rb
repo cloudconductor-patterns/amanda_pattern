@@ -46,7 +46,7 @@ template amandahosts_client do
   )
 end
 
-parameters = node[:cloudconductor]
+parameters = node['cloudconductor']
 roles = ENV['ROLE'].nil? ? [] : ENV['ROLE'].split(',')
 hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
   role_config[:paths].each do |path_config|
