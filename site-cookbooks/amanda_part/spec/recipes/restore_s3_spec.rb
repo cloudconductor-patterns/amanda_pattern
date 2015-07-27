@@ -120,8 +120,8 @@ describe 'amanda_part::restore_s3' do
     expect(chef_run).to create_directory('/var/lib/amanda/restore')
   end
 
-  it 'execute pre_restore script' do
-    expect(chef_run).to run_execute('execute pre_restore script')
+  it 'execute pre_restore script web_test' do
+    expect(chef_run).to run_execute('execute pre_restore script web_test')
   end
 
   it 'download restore file' do
@@ -140,7 +140,7 @@ describe 'amanda_part::restore_s3' do
     expect(chef_run).to run_execute('execute restore')
   end
 
-  it 'execute post_restore script' do
-    expect(chef_run).to run_execute('execute post_restore script')
+  it 'execute post_restore script web_test' do
+    expect(chef_run).to run_execute('execute post_restore script web_test')
   end
 end

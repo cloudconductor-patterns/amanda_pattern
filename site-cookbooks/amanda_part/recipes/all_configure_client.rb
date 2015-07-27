@@ -81,7 +81,8 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
           script: script_config[:script]
         )
       end
-      directory path_config[:path] do
+      directory "#{path_config[:path]}_#{script_name}" do
+        path path_config[:path]
         owner node['amanda_part']['user']
         group node['amanda_part']['group']
         mode 0777

@@ -46,7 +46,7 @@ unless target_bucket.size == 0
         not_if { File.exist?(node['amanda_part']['amanda_restore_work_dir']) }
       end
 
-      execute 'execute pre_restore script' do
+      execute "execute pre_restore script #{config[:name]}" do
         command "su - #{node['amanda_part']['user']} -l -c /usr/libexec/amanda/application/pre_restore_#{config[:name]}"
         action :run
         not_if { path_config[:scripts]["pre_restore_#{config[:name]}"].nil? }
@@ -109,7 +109,7 @@ unless target_bucket.size == 0
         action :run
       end
 
-      execute 'execute post_restore script' do
+      execute "execute post_restore script #{config[:name]}" do
         command "su - #{node['amanda_part']['user']} -l -c /usr/libexec/amanda/application/post_restore_#{config[:name]}"
         action :run
         not_if { path_config[:scripts]["post_restore_#{config[:name]}"].nil? }
