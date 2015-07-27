@@ -22,6 +22,7 @@ end
 
 ruby_block 'backup_restore_backup_ready_event' do
   block do
-    `consul event -name="backup_ready" "${CONSUL_SECRET_KEY}"`
+    cmd = Mixlib::ShellOut.new("consul event -name=\"backup_ready\" ${CONSUL_SECRET_KEY}")
+    cmd.run_command
   end
 end
