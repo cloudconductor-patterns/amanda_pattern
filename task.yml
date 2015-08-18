@@ -36,6 +36,8 @@ tasks:
   setup:
     description: Execute setup chef
     operations:
+      - execute:
+          file: prepare.sh
       - chef:
           run_list:
             - role[{{role}}_setup]
