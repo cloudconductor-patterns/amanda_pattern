@@ -73,6 +73,5 @@ tasks:
   spec:
     description: Execute spec chef
     operations:
-      - chef:
-          run_list:
-            - role[{{role}}_spec]
+      - execute:
+          script: python lib/event_handler.py {{role}} spec
