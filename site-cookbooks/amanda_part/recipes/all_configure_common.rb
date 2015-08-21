@@ -16,6 +16,14 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
       action :create
       not_if { File.exist?(config[:config_dir]) }
     end
+    directory path_config[:path] do
+      owner node['amanda_part']['user']
+      group node['amanda_part']['group']
+      mode 0777
+      recursive true
+      action :create
+      only_if { path_config[:prepare_path] && !File.exist?(path_config[:path]) }
+    end
     amanda_client_conf = File.join(config[:config_dir], 'amanda-client.conf')
     template amanda_client_conf do
       owner node['amanda_part']['user']
@@ -37,14 +45,6 @@ hosts_paths_privileges_by_role(roles, parameters).each do |role, role_config|
         variables(
           script: script_config[:script]
         )
-      end
-      directory path_config[:path] do
-        owner node['amanda_part']['user']
-        group node['amanda_part']['group']
-        mode 0777
-        recursive true
-        action :create
-        only_if { path_config[:prepare_path] && !File.exist?(path_config[:path]) }
       end
     end
   end
