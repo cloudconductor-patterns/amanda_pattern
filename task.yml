@@ -6,7 +6,6 @@ variables:
 
 default:
   timeout: 1800
-  chef_config: solo.rb
 
 events:
   setup:
