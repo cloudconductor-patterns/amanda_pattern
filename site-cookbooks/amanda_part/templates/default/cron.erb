@@ -2,4 +2,4 @@ SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
 MAILTO=root
 HOME=/
-<%= @schedule %> root consul event -name backup <%= @consul_secret_key %>
+<%= @schedule %> root consul event -name backup <%= @consul_secret_key %> > /dev/null
