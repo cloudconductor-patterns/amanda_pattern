@@ -80,4 +80,4 @@ tasks:
     description: Execute spec chef
     operations:
       - execute:
-          script: python lib/event_handler.py {{role}} spec
+          script: python lib/serverspec.py {{role}}
