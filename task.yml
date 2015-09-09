@@ -1,0 +1,83 @@
+variables:
+  HOME: /root
+  PATH: $PATH:/opt/chefdk/embedded/bin:/opt/chef/embedded/bin:/usr/bin
+  ROLE: '{{config.role}}'
+  CONSUL_SECRET_KEY: '{{config.token}}'
+
+default:
+  timeout: 1800
+  chef:
+    attribute_keys:
+      - cloudconductor
+
+events:
+  setup:
+    description: Execute setup
+    task: setup
+
+  configure:
+    priority: 99
+    description: Execute configure chef
+    task: configure
+
+  deploy:
+    description: Execute deploy
+    task: deploy
+
+  backup:
+    description: Execute backup
+    priority: 80
+    task: backup
+
+  restore:
+    description: Execute restore
+    priority: 20
+    task: restore
+
+  spec:
+    description: Execute spec
+    task: spec
+
+tasks:
+  setup:
+    description: Execute setup chef
+    operations:
+      - execute:
+          file: prepare.sh
+      - chef:
+          run_list:
+            - role[{{role}}_setup]
+
+  configure:
+    description: Execute configure chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_configure]
+
+  deploy:
+    description: Execute deploy chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_deploy]
+
+  backup:
+    description: Execute backup chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_backup]
+
+  restore:
+    description: Execute restore chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_restore]
+
+  spec:
+    description: Execute spec chef
+    operations:
+      - execute:
+          script: python lib/serverspec.py {{role}}

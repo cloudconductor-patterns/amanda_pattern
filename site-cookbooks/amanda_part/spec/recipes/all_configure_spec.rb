@@ -34,7 +34,7 @@ describe 'amanda_part::all_configure' do
     expect(chef_run).to include_recipe 'amanda_part::all_configure_client'
   end
 
-  it 'issue backup_ready event' do
-    expect(chef_run).to run_ruby_block('backup_restore_backup_ready_event')
+  it 'include all_configure_common' do
+    expect(chef_run).to include_recipe 'amanda_part::all_configure_common'
   end
 end

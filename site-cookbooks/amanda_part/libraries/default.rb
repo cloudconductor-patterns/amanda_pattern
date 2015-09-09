@@ -30,14 +30,9 @@ module CloudConductor
       end
     end
 
-    # rubocop: disable MethodLength
     def hosts_paths_privileges_under_role(parameters)
       return {} if parameters.nil?
-      patterns = parameters[:patterns] || {}
-      role_config = patterns.inject({}) do |result, (_pattern_name, pattern)|
-        next result if pattern[:config].nil? || pattern[:config][:backup_restore].nil?
-        ::Chef::Mixin::DeepMerge.deep_merge!(pattern[:config][:backup_restore], result)
-      end
+      role_config = parameters[:backup_restore] || {}
       ::Chef::Mixin::DeepMerge.deep_merge!(
         application_hosts_paths_privileges_under_role(parameters),
         role_config
@@ -101,7 +96,7 @@ module CloudConductor
       path_parameter[:script].inject({}) do |script_config, (script_name, script)|
         script_config.merge(
           "#{script_name}_#{config_name}" => {
-            timing: script_timing[script_name],
+            timing: script_timing[script_name.to_sym],
             script: script
           }
         )
