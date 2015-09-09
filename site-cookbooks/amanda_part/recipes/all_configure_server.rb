@@ -70,7 +70,7 @@ hosts_paths_privileges_under_role(parameters).each do |role, role_host_backup_re
       source 'cron.erb'
       mode 0644
       variables(
-        config_name: config[:name],
+        consul_secret_key: ENV['CONSUL_SECRET_KEY'],
         schedule: path_config[:schedule]
       )
     end

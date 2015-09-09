@@ -2,4 +2,4 @@ SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
 HOME=/
-<%= @schedule %> root su - <%= node['amanda_part']['user'] %> -c "amdump <%= @config_name %>"
+<%= @schedule %> root consul event -name backup <%= @consul_secret_key %>
