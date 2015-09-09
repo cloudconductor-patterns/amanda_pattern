@@ -30,7 +30,6 @@ module CloudConductor
       end
     end
 
-    # rubocop: disable MethodLength
     def hosts_paths_privileges_under_role(parameters)
       return {} if parameters.nil?
       role_config = parameters[:backup_restore] || {}
