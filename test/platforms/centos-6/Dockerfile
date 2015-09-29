@@ -41,7 +41,7 @@ RUN echo "https_proxy = <%= @https_proxy %>" >> /etc/wgetrc
 <% end %>
 <% end %>
 
-RUN curl -L http://www.opscode.com/chef/install.sh | bash
+RUN curl -L http://www.opscode.com/chef/install.sh | bash -s -- -v 11
 RUN /opt/chef/embedded/bin/gem install berkshelf
 
 RUN git clone https://github.com/cloudconductor/cloud_conductor_init.git /opt/cloudconductor
@@ -62,7 +62,7 @@ RUN echo 'git checkout feature/unused-ruby' >> ./bootstrap.sh
 RUN echo 'git pull' >> ./bootstrap.sh
 RUN echo 'export PATTERN_NAME="<%= @cc_pattern %>"' >> ./bootstrap.sh
 RUN echo 'export PATTERN_URL="https://github.com/cloudconductor-patterns/<%= @cc_pattern %>.git"' >> ./bootstrap.sh
-RUN echo 'export PATTERN_REVISION="develop"' >> ./bootstrap.sh
+RUN echo 'export PATTERN_REVISION="master"' >> ./bootstrap.sh
 RUN echo 'export ROLE="<%= @cc_role %>"' >> ./bootstrap.sh
 RUN echo 'export CONSUL_SECRET_KEY="<%= @cc_token %>"' >> ./bootstrap.sh
 RUN echo 'bash -x ./bin/setup.sh' >> ./bootstrap.sh
