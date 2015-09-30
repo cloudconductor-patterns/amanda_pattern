@@ -19,9 +19,4 @@ if amanda_server?
 else
   include_recipe 'amanda_part::all_configure_client'
 end
-
-ruby_block 'backup_restore_backup_ready_event' do
-  block do
-    `consul event -name="backup_ready" "${CONSUL_SECRET_KEY}"`
-  end
-end
+include_recipe 'amanda_part::all_configure_common'

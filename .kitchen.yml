@@ -1,0 +1,32 @@
+---
+driver:
+  name: docker
+  cc_pattern: "<%= File.basename(Dir.pwd) %>"
+
+provisioner:
+  name: chef_solo
+  attributes:
+    cloudconductor:
+      servers:
+        testhost:
+          private_ip: '172.0.0.1'
+          roles: 'backup_restore'
+
+platforms:
+  - name: centos-6
+    driver:
+      dockerfile: test/platforms/centos-6/Dockerfile
+
+suites:
+  - name: all_configure
+    driver:
+      cc_role: 'all'
+    run_list:
+      - role[all_configure]
+
+  - name: all_deploy
+    driver:
+      cc_role: 'all'
+    run_list:
+      - role[all_configure]
+      - role[all_deploy]

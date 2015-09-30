@@ -4,6 +4,7 @@ Chef::Recipe.send(:include, CloudConductor::AmandaPartHelper)
 require 'aws-sdk-core'
 
 bucket_name = node['amanda_part']['server']['s3']['tpchanger']['bucket_name']
+prefix = node['amanda_part']['server']['s3']['tpchanger']['prefix']
 s3 = Aws::S3::Client.new(
   region: node['amanda_part']['server']['s3']['tpchanger']['s3_bucket_location'],
   access_key_id: node['amanda_part']['server']['s3']['tpchanger']['s3_access_key'],
@@ -14,7 +15,7 @@ target_bucket = s3.list_buckets.buckets.select do |bucket|
   bucket.name == bucket_name
 end
 
-parameters = CloudConductorUtils::Consul.read_parameters[:cloudconductor]
+parameters = node['cloudconductor']
 roles = ENV['ROLE'].split(',')
 
 unless target_bucket.size == 0
@@ -22,32 +23,37 @@ unless target_bucket.size == 0
     role_config[:paths].each do |path_config|
       config = amanda_config(role, path_config[:path])
       restore_file = File.join(node['amanda_part']['amanda_restore_work_dir'], 'restore.tar')
-      next unless path_config[:restore_enabled] && s3.list_objects(bucket: bucket_name).contents.size > 0
+      next unless path_config[:restore_enabled] && s3.list_objects(bucket: bucket_name, prefix: prefix).contents.size > 0
+
+      path_pattern = "#{role}/#{config[:disk_postfix]}/"
+      filestart_pattern = "#{path_pattern}.*-filestart"
+      objects = s3.list_objects(bucket: bucket_name, prefix: prefix)
+      target_filestarts = objects.contents.select do |object|
+        object.key.match(/#{filestart_pattern}/)
+      end
+      next if target_filestarts.empty?
+
       directory node['amanda_part']['amanda_restore_work_dir'] do
         recursive true
         action :delete
         only_if { File.exist?(node['amanda_part']['amanda_restore_work_dir']) }
       end
+
       directory node['amanda_part']['amanda_restore_work_dir'] do
         mode 0755
         recursive true
         action :create
         not_if { File.exist?(node['amanda_part']['amanda_restore_work_dir']) }
       end
-      execute 'execute pre_restore script' do
+
+      execute "execute pre_restore script #{config[:name]}" do
         command "su - #{node['amanda_part']['user']} -l -c /usr/libexec/amanda/application/pre_restore_#{config[:name]}"
         action :run
         not_if { path_config[:scripts]["pre_restore_#{config[:name]}"].nil? }
       end
+
       ruby_block 'download restore file' do
         block do
-          path_pattern = "#{role}/#{config[:disk_postfix]}/"
-          filestart_pattern = "#{path_pattern}.*-filestart"
-          data_pattern = "#{path_pattern}.*\.data"
-          objects = s3.list_objects(bucket: bucket_name)
-          target_filestarts = objects.contents.select do |object|
-            object.key.match(/#{filestart_pattern}/)
-          end
           exists_filestarts = target_filestarts.each_with_object([]) do |object, result|
             s3.get_object(bucket: bucket_name, key: object.key) do |chunk|
               result << object if chunk.match(/^ORIGSIZE=10$/m).nil?
@@ -84,22 +90,26 @@ unless target_bucket.size == 0
           end
         end
       end
+
       execute 'concatenate restore files' do
         command "cat #{node['amanda_part']['amanda_restore_work_dir']}/*.data > #{restore_file}"
         action :run
       end
+
       ruby_block 'cleanup target directory' do
         block do
           require 'fileutils'
           FileUtils.rm_rf "#{path_config[:path]}/*"
         end
       end
+
       execute 'execute restore' do
         command "tar xvf #{restore_file}"
         cwd path_config[:path]
         action :run
       end
-      execute 'execute post_restore script' do
+
+      execute "execute post_restore script #{config[:name]}" do
         command "su - #{node['amanda_part']['user']} -l -c /usr/libexec/amanda/application/post_restore_#{config[:name]}"
         action :run
         not_if { path_config[:scripts]["post_restore_#{config[:name]}"].nil? }

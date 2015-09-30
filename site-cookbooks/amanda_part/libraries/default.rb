@@ -14,9 +14,9 @@
 # limitations under the License.
 
 require 'socket'
-require 'cloud_conductor_utils/consul'
 
 module CloudConductor
+  # rubocop: disable ModuleLength
   module AmandaPartHelper
     def hosts_paths_privileges_by_role(roles, parameters)
       return {} if roles.nil? || parameters.nil?
@@ -30,14 +30,9 @@ module CloudConductor
       end
     end
 
-    # rubocop: disable MethodLength
     def hosts_paths_privileges_under_role(parameters)
       return {} if parameters.nil?
-      patterns = parameters[:patterns] || {}
-      role_config = patterns.inject({}) do |result, (_pattern_name, pattern)|
-        next result if pattern[:config].nil? || pattern[:config][:backup_restore].nil?
-        ::Chef::Mixin::DeepMerge.deep_merge!(pattern[:config][:backup_restore], result)
-      end
+      role_config = parameters[:backup_restore] || {}
       ::Chef::Mixin::DeepMerge.deep_merge!(
         application_hosts_paths_privileges_under_role(parameters),
         role_config
@@ -66,10 +61,12 @@ module CloudConductor
     end
 
     def hosts_under_role(role)
-      servers = CloudConductorUtils::Consul.read_servers
+      if node['cloudconductor'] && node['cloudconductor']['servers']
+        servers = node['cloudconductor']['servers']
+      end
       return [] if servers.nil?
       servers.select do |_hostname, server_info|
-        server_info[:roles].include?(role.to_s)
+        server_info['roles'].include?(role.to_s)
       end
     end
 
@@ -99,7 +96,7 @@ module CloudConductor
       path_parameter[:script].inject({}) do |script_config, (script_name, script)|
         script_config.merge(
           "#{script_name}_#{config_name}" => {
-            timing: script_timing[script_name],
+            timing: script_timing[script_name.to_sym],
             script: script
           }
         )
@@ -108,10 +105,10 @@ module CloudConductor
 
     def script_timing
       {
-        pre_backup: 'pre-dle-backup',
-        post_backup: 'post-dle-backup',
-        pre_restore: 'pre-recover',
-        post_restore: 'post-recover'
+        'pre_backup' => 'pre-dle-backup',
+        'post_backup' => 'post-dle-backup',
+        'pre_restore' => 'pre-recover',
+        'post_restore' => 'post-recover'
       }
     end
 
@@ -158,7 +155,7 @@ module CloudConductor
 
     def amanda_server
       server = server_info('backup_restore').first
-      private_ip = server[:private_ip].split('.').map(&:to_i).pack('C4')
+      private_ip = server['private_ip'].split('.').map(&:to_i).pack('C4')
       begin
         server[:alias] = Socket.gethostbyaddr(private_ip)[0]
       rescue SocketError
@@ -168,15 +165,22 @@ module CloudConductor
     end
 
     def amanda_clients
-      CloudConductorUtils::Consul.read_servers.each_with_object({}) do |(hostname, client), result|
-        client[:hostname] = hostname
-        private_ip = client[:private_ip].split('.').map(&:to_i).pack('C4')
+      if node['cloudconductor'] && node['cloudconductor']['servers']
+        servers = node['cloudconductor']['servers']
+      else
+        servers = {}
+      end
+      servers.each_with_object({}) do |(hostname, client), result|
+        server = {}
+        server[:hostname] = hostname
+        server[:private_ip] = client[:private_ip]
         begin
-          client[:alias] = Socket.gethostbyaddr(private_ip)[0]
+          private_ip = client[:private_ip].split('.').map(&:to_i).pack('C4')
+          server[:alias] = Socket.gethostbyaddr(private_ip)[0]
         rescue SocketError
-          client[:alias] = nil
+          server[:alias] = nil
         end
-        result[hostname] = client
+        result[hostname] = server
       end
     end
 
@@ -184,4 +188,5 @@ module CloudConductor
       amanda_server[:hostname] == node['hostname']
     end
   end
+  # rubocop: enable ModuleLength
 end
