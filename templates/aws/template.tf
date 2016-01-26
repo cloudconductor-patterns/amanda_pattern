@@ -45,3 +45,7 @@ resource "aws_instance" "backup_restore_server" {
     Name = "BackupRestoreServer"
   }
 }
+
+output "cluster_addresses" {
+  value = "${aws_instance.backup_restore_server.private_ip}"
+}
