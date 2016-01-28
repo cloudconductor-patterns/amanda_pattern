@@ -7,8 +7,15 @@ version:          "1.1.0"
 url:              "https://github.com/cloudconductor-patterns/amanda_pattern"
 
 type:      "optional"
-depends:   []
+dependencies: ["common_network"]
 conflicts: []
+
+providers:
+    aws:
+      - cloud_formation
+      - terraform
+    openstack:
+      - cloud_formation
 
 supports:
   - platform: "centos"
