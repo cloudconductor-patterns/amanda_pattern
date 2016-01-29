@@ -31,13 +31,18 @@ module CloudConductor
     end
 
     def hosts_paths_privileges_under_role(parameters)
-      return {} if parameters.nil?
-      role_config = parameters[:backup_restore] || {}
-      ::Chef::Mixin::DeepMerge.deep_merge!(
-        application_hosts_paths_privileges_under_role(parameters),
-        role_config
-      )
-      role_config.inject({}) do |result, (role, role_parameter)|
+      parameters ||= {}
+
+      file_parameters = read_backup_restore
+      configure_parameters = parameters['backup_restore']
+      application_parameters = application_hosts_paths_privileges_under_role(parameters)
+
+      backup_restore = {}
+      ::Chef::Mixin::DeepMerge.deep_merge!(file_parameters, backup_restore)
+      ::Chef::Mixin::DeepMerge.deep_merge!(configure_parameters, backup_restore)
+      ::Chef::Mixin::DeepMerge.deep_merge!(application_parameters, backup_restore)
+
+      backup_restore.inject({}) do |result, (role, role_parameter)|
         ::Chef::Mixin::DeepMerge.deep_merge!(
           {
             role => {
@@ -50,7 +55,13 @@ module CloudConductor
         )
       end
     end
-    # rubocop: enable MethodLength
+
+    def read_backup_restore
+      patterns_dir = File.join(node['amanda_part']['patterns_dir'], '*', node['amanda_part']['backup_restore_file'])
+      Dir.glob(patterns_dir).inject({}) do |result, path|
+        ::Chef::Mixin::DeepMerge.deep_merge!(YAML.load_file(path).with_indifferent_access, result)
+      end
+    end
 
     def application_hosts_paths_privileges_under_role(parameters)
       applications = parameters[:applications] || {}
