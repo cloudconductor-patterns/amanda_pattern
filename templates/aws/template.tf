@@ -46,6 +46,10 @@ resource "aws_instance" "backup_restore_server" {
   }
 }
 
+output "consul_addresses" {
+  value = "${aws_instance.backup_restore_server.public_ip}"
+}
+
 output "cluster_addresses" {
   value = "${aws_instance.backup_restore_server.private_ip}"
 }
