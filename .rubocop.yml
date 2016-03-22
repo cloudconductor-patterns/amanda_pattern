@@ -20,6 +20,9 @@ AsciiComments:
 Documentation:
   Enabled: false
 
+Style/NumericLiterals:
+  Enabled: false
+
 Style/RegexpLiteral:
   Enabled: false
 
