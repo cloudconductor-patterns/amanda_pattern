@@ -4,7 +4,7 @@ About
 This is the optional pattern designed to attach backup functions which amanda provides to platform patterns.
 Currently supported:
 
-* CentOS (6.5)
+* CentOS (~>6.5)
 * amanda (>= 3.6.6)
 
 For more information, please visit [official web site](http://cloudconductor.org/).
@@ -15,7 +15,7 @@ Requirements
 Prerequisites
 -------------
 
-- cloudconductor (>= 1.1)
+- cloudconductor (>= 2.0)
 - any platform pattern
 
 How to use patterns
@@ -36,7 +36,7 @@ Please see the attribute files if you want to know what kind of attributes are i
 Copyright and License
 =====================
 
-Copyright 2015 TIS inc.
+Copyright 2015,2016 TIS inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
