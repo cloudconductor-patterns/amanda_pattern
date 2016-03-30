@@ -1,6 +1,6 @@
 variables:
   HOME: /root
-  PATH: $PATH:/opt/chefdk/embedded/bin:/opt/chef/embedded/bin:/usr/bin
+  PATH: $PATH:/usr/local/bin:/usr/bin
   ROLE: '{{config.role}}'
   CONSUL_SECRET_KEY: '{{config.token}}'
 
@@ -43,6 +43,9 @@ tasks:
     description: Execute setup chef
     operations:
       - execute:
+          script: |
+            gem install activesupport
+      - execute:
           file: prepare.sh
       - chef:
           run_list:
@@ -80,4 +83,5 @@ tasks:
     description: Execute spec chef
     operations:
       - execute:
-          script: python lib/serverspec.py {{role}}
+          script: |
+            python lib/serverspec.py {{role}}
